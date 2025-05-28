@@ -1,0 +1,67 @@
+{
+  "name": "business-management-system",
+  "version": "1.0.0",
+  "description": "Інформаційна система управління бізнес-діяльністю підприємства",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "docker-compose up",
+    "start:dev": "./config/switch-env.sh development && docker-compose up",
+    "start:test": "./config/switch-env.sh testing && docker-compose up",
+    "start:prod": "./config/switch-env.sh production && docker-compose up",
+    "migrate": "node ci-scripts/migrate.js",
+    "migrate:dev": "node ci-scripts/migrate.js development",
+    "migrate:test": "node ci-scripts/migrate.js testing",
+    "migrate:prod": "node ci-scripts/migrate.js production",
+    "db:migrate": "node ci-scripts/db-migrate.js all up",
+    "db:migrate:auth": "node ci-scripts/db-migrate.js auth-service up",
+    "db:migrate:order": "node ci-scripts/db-migrate.js order-service up",
+    "db:migrate:crm": "node ci-scripts/db-migrate.js crm-service up",
+    "db:migrate:inventory": "node ci-scripts/db-migrate.js inventory-service up",
+    "db:migrate:finance": "node ci-scripts/db-migrate.js finance-service up",
+    "db:rollback": "node ci-scripts/db-migrate.js all down",
+    "db:status": "node ci-scripts/db-migrate.js all status",
+    "db:create-migration": "node ci-scripts/db-migrate.js",
+    "test:smoke": "node ci-scripts/smoke-tests.js",
+    "test:smoke:dev": "node ci-scripts/smoke-tests.js development",
+    "test:smoke:test": "node ci-scripts/smoke-tests.js testing",
+    "test:smoke:prod": "node ci-scripts/smoke-tests.js production",
+    "deploy": "node ci-scripts/deploy.js",
+    "deploy:dev": "node ci-scripts/deploy.js development",
+    "deploy:test": "node ci-scripts/deploy.js testing",
+    "deploy:prod": "node ci-scripts/deploy.js production",
+    "setup:env": "./config/setup-env.sh",
+    "setup:env:dev": "./config/setup-env.sh development",
+    "setup:env:test": "./config/setup-env.sh testing",
+    "setup:env:prod": "./config/setup-env.sh production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/business-management-system.git"
+  },
+  "keywords": [
+    "erp",
+    "business",
+    "management",
+    "microservices"
+  ],
+  "author": "Yevhen Shkurnhykov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/username/business-management-system/issues"
+  },
+  "homepage": "https://github.com/username/business-management-system#readme",
+  "devDependencies": {
+    "axios": "^1.4.0",
+    "dotenv": "^16.0.3",
+    "sequelize-cli": "^6.6.1"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "pg": "^8.11.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.32.0",
+    "umzug": "^3.2.1",
+    "uuid": "^9.0.0"
+  }
+}

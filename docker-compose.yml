@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: ../../docker/development/api-gateway.Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./config/environments/development/api-gateway.env
+    depends_on:
+      - auth-service
+      - order-service
+      - crm-service
+      - inventory-service
+      - finance-service
+      - analytics-service
+    volumes:
+      - ./backend/api-gateway:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: ../../docker/development/node-service.Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./config/environments/development/auth-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/auth-service:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Order Service
+  order-service:
+    build:
+      context: ./backend/order-service
+      dockerfile: ../../docker/development/node-service.Dockerfile
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./config/environments/development/order-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/order-service:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # CRM Service
+  crm-service:
+    build:
+      context: ./backend/crm-service
+      dockerfile: ../../docker/development/node-service.Dockerfile
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./config/environments/development/crm-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/crm-service:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./backend/inventory-service
+      dockerfile: ../../docker/development/node-service.Dockerfile
+    ports:
+      - "8004:8004"
+    env_file:
+      - ./config/environments/development/inventory-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/inventory-service:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Finance Service
+  finance-service:
+    build:
+      context: ./backend/finance-service
+      dockerfile: ../../docker/development/node-service.Dockerfile
+    ports:
+      - "8005:8005"
+    env_file:
+      - ./config/environments/development/finance-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/finance-service:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Analytics Service (Python)
+  analytics-service:
+    build:
+      context: ./backend/analytics-service
+      dockerfile: ../../docker/development/python-service.Dockerfile
+    ports:
+      - "8006:8006"
+    env_file:
+      - ./config/environments/development/analytics-service.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/analytics-service:/app
+    networks:
+      - erp-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/development/frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./config/environments/development/frontend.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - erp-network
+
+  # Database
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=erp_auth,erp_orders,erp_crm,erp_inventory,erp_finance,erp_analytics
+    volumes:
+      - ./database/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - erp-network
+
+networks:
+  erp-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,26 @@
+# GitHub Environments Configuration
+
+# Development Environment
+# No protection rules, automatic deployments
+development:
+  protection_rules: []
+  auto_deploy: true
+  url_pattern: https://dev-erp.example.com
+
+# Testing Environment
+# Requires one reviewer approval
+testing:
+  protection_rules:
+    - required_reviewers: 1
+    - wait_timer: 0
+  auto_deploy: true
+  url_pattern: https://test-erp.example.com
+
+# Production Environment
+# Requires two reviewer approvals and a 15-minute wait timer
+production:
+  protection_rules:
+    - required_reviewers: 2
+    - wait_timer: 15
+  auto_deploy: false
+  url_pattern: https://erp.example.com

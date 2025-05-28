@@ -1,0 +1,376 @@
+@startuml Database ER Diagram
+
+' Налаштування стилів
+skinparam linetype ortho
+skinparam roundcorner 20
+skinparam class {
+  BackgroundColor White
+  ArrowColor #2C3E50
+  BorderColor #2C3E50
+}
+
+' Схема auth_service
+package "auth_service" {
+  entity "users" as auth_users {
+    * id : UUID <<PK>>
+    --
+    * email : VARCHAR(255) <<unique>>
+    * password_hash : VARCHAR(255)
+    * first_name : VARCHAR(100)
+    * last_name : VARCHAR(100)
+    phone : VARCHAR(20)
+    * role : VARCHAR(50)
+    * is_active : BOOLEAN
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "roles" as auth_roles {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(50) <<unique>>
+    description : TEXT
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "permissions" as auth_permissions {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100) <<unique>>
+    description : TEXT
+    * resource : VARCHAR(100)
+    * action : VARCHAR(50)
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "role_permissions" as auth_role_permissions {
+    * role_id : UUID <<FK>>
+    * permission_id : UUID <<FK>>
+    --
+    * created_at : TIMESTAMP
+  }
+  
+  entity "refresh_tokens" as auth_refresh_tokens {
+    * id : UUID <<PK>>
+    --
+    * user_id : UUID <<FK>>
+    * token : VARCHAR(255) <<unique>>
+    * expires_at : TIMESTAMP
+    * created_at : TIMESTAMP
+  }
+  
+  auth_roles ||--o{ auth_role_permissions
+  auth_permissions ||--o{ auth_role_permissions
+  auth_users ||--o{ auth_refresh_tokens
+}
+
+' Схема crm_service
+package "crm_service" {
+  entity "customers" as crm_customers {
+    * id : UUID <<PK>>
+    --
+    * first_name : VARCHAR(100)
+    * last_name : VARCHAR(100)
+    email : VARCHAR(255) <<unique>>
+    phone : VARCHAR(20)
+    address : TEXT
+    city : VARCHAR(100)
+    postal_code : VARCHAR(20)
+    country : VARCHAR(100)
+    * status : VARCHAR(50)
+    type : VARCHAR(50)
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "contacts" as crm_contacts {
+    * id : UUID <<PK>>
+    --
+    * customer_id : UUID <<FK>>
+    * first_name : VARCHAR(100)
+    * last_name : VARCHAR(100)
+    position : VARCHAR(100)
+    email : VARCHAR(255)
+    phone : VARCHAR(20)
+    * is_primary : BOOLEAN
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "interactions" as crm_interactions {
+    * id : UUID <<PK>>
+    --
+    * customer_id : UUID <<FK>>
+    * user_id : UUID
+    * type : VARCHAR(50)
+    * subject : VARCHAR(255)
+    description : TEXT
+    * date : TIMESTAMP
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  crm_customers ||--o{ crm_contacts
+  crm_customers ||--o{ crm_interactions
+}
+
+' Схема order_service
+package "order_service" {
+  entity "orders" as order_orders {
+    * id : UUID <<PK>>
+    --
+    * customer_id : UUID
+    * order_number : VARCHAR(50) <<unique>>
+    * status : VARCHAR(50)
+    * total_amount : DECIMAL(10,2)
+    shipping_address : TEXT
+    shipping_city : VARCHAR(100)
+    shipping_postal_code : VARCHAR(20)
+    shipping_country : VARCHAR(100)
+    shipping_method : VARCHAR(100)
+    payment_method : VARCHAR(100)
+    notes : TEXT
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "order_items" as order_order_items {
+    * id : UUID <<PK>>
+    --
+    * order_id : UUID <<FK>>
+    * product_id : UUID
+    * quantity : INTEGER
+    * unit_price : DECIMAL(10,2)
+    * total_price : DECIMAL(10,2)
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "order_status_history" as order_status_history {
+    * id : UUID <<PK>>
+    --
+    * order_id : UUID <<FK>>
+    * status : VARCHAR(50)
+    comment : TEXT
+    * user_id : UUID
+    * created_at : TIMESTAMP
+  }
+  
+  order_orders ||--o{ order_order_items
+  order_orders ||--o{ order_status_history
+}
+
+' Схема inventory_service
+package "inventory_service" {
+  entity "products" as inventory_products {
+    * id : UUID <<PK>>
+    --
+    * sku : VARCHAR(50) <<unique>>
+    * name : VARCHAR(255)
+    description : TEXT
+    * category_id : UUID <<FK>>
+    * price : DECIMAL(10,2)
+    cost : DECIMAL(10,2)
+    weight : DECIMAL(10,2)
+    dimensions : VARCHAR(100)
+    * is_active : BOOLEAN
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "categories" as inventory_categories {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100) <<unique>>
+    description : TEXT
+    parent_id : UUID <<FK>>
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "inventory" as inventory_inventory {
+    * id : UUID <<PK>>
+    --
+    * product_id : UUID <<FK>>
+    * warehouse_id : UUID <<FK>>
+    * quantity : INTEGER
+    * reserved_quantity : INTEGER
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "warehouses" as inventory_warehouses {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100)
+    address : TEXT
+    city : VARCHAR(100)
+    postal_code : VARCHAR(20)
+    country : VARCHAR(100)
+    * is_active : BOOLEAN
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "inventory_transactions" as inventory_transactions {
+    * id : UUID <<PK>>
+    --
+    * product_id : UUID <<FK>>
+    * warehouse_id : UUID <<FK>>
+    * type : VARCHAR(50)
+    * quantity : INTEGER
+    reference_id : UUID
+    reference_type : VARCHAR(50)
+    notes : TEXT
+    * user_id : UUID
+    * created_at : TIMESTAMP
+  }
+  
+  inventory_categories ||--o{ inventory_products
+  inventory_categories ||--o{ inventory_categories : parent
+  inventory_products ||--o{ inventory_inventory
+  inventory_warehouses ||--o{ inventory_inventory
+  inventory_products ||--o{ inventory_transactions
+  inventory_warehouses ||--o{ inventory_transactions
+}
+
+' Схема finance_service
+package "finance_service" {
+  entity "transactions" as finance_transactions {
+    * id : UUID <<PK>>
+    --
+    * type : VARCHAR(50)
+    * amount : DECIMAL(10,2)
+    * currency : VARCHAR(3)
+    * account_id : UUID <<FK>>
+    * category_id : UUID <<FK>>
+    description : TEXT
+    reference_id : UUID
+    reference_type : VARCHAR(50)
+    * transaction_date : DATE
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "accounts" as finance_accounts {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100)
+    * type : VARCHAR(50)
+    * currency : VARCHAR(3)
+    * balance : DECIMAL(10,2)
+    * is_active : BOOLEAN
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "transaction_categories" as finance_transaction_categories {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100)
+    * type : VARCHAR(50)
+    parent_id : UUID <<FK>>
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "invoices" as finance_invoices {
+    * id : UUID <<PK>>
+    --
+    * invoice_number : VARCHAR(50) <<unique>>
+    * customer_id : UUID
+    order_id : UUID
+    * amount : DECIMAL(10,2)
+    * tax_amount : DECIMAL(10,2)
+    * total_amount : DECIMAL(10,2)
+    * currency : VARCHAR(3)
+    * status : VARCHAR(50)
+    * due_date : DATE
+    notes : TEXT
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "invoice_items" as finance_invoice_items {
+    * id : UUID <<PK>>
+    --
+    * invoice_id : UUID <<FK>>
+    * description : TEXT
+    * quantity : DECIMAL(10,2)
+    * unit_price : DECIMAL(10,2)
+    * tax_rate : DECIMAL(5,2)
+    * amount : DECIMAL(10,2)
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  finance_accounts ||--o{ finance_transactions
+  finance_transaction_categories ||--o{ finance_transactions
+  finance_transaction_categories ||--o{ finance_transaction_categories : parent
+  finance_invoices ||--o{ finance_invoice_items
+}
+
+' Схема analytics_service
+package "analytics_service" {
+  entity "reports" as analytics_reports {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(255)
+    description : TEXT
+    * type : VARCHAR(50)
+    parameters : JSONB
+    * created_by : UUID
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "report_executions" as analytics_report_executions {
+    * id : UUID <<PK>>
+    --
+    * report_id : UUID <<FK>>
+    parameters : JSONB
+    result : JSONB
+    * status : VARCHAR(50)
+    * executed_by : UUID
+    * started_at : TIMESTAMP
+    completed_at : TIMESTAMP
+  }
+  
+  entity "kpi_metrics" as analytics_kpi_metrics {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(100)
+    description : TEXT
+    * category : VARCHAR(50)
+    calculation_query : TEXT
+    * created_at : TIMESTAMP
+    * updated_at : TIMESTAMP
+  }
+  
+  entity "kpi_values" as analytics_kpi_values {
+    * id : UUID <<PK>>
+    --
+    * metric_id : UUID <<FK>>
+    * value : DECIMAL(15,2)
+    * period_start : DATE
+    * period_end : DATE
+    * created_at : TIMESTAMP
+  }
+  
+  analytics_reports ||--o{ analytics_report_executions
+  analytics_kpi_metrics ||--o{ analytics_kpi_values
+}
+
+' Зв'язки між схемами
+crm_customers ||..o{ order_orders
+order_orders ||..o{ finance_invoices
+inventory_products ||..o{ order_order_items
+auth_users ||..o{ crm_interactions : user
+auth_users ||..o{ order_status_history : user
+auth_users ||..o{ inventory_transactions : user
+auth_users ||..o{ analytics_reports : created_by
+auth_users ||..o{ analytics_report_executions : executed_by
+
+@enduml

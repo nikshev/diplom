@@ -1,0 +1,85 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.cursor
+.roo
+.scripts
+# OS specific
+.DS_Store
+Thumbs.db
+.env.example
+.roomodes
+.taskmasterconfig
+.windsurfrules
+scripts
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+pyenv/
+Pipfile.lock
+.pytest_cache/
+.coverage
+
+# PostgreSQL
+*.dump
+
+# Docker
+.docker/
+
+# Task files
+tasks.json
+tasks/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Local Netlify folder
+.netlify
