@@ -143,7 +143,10 @@ const OrderForm = () => {
   // Set order data when fetched
   useEffect(() => {
     if (orderData) {
-      setOrder(orderData);
+      setOrder({
+        ...orderData,
+        items: orderData.items || [] // Ensure items is always an array
+      });
       if (orderData.customer) {
         setSelectedCustomer(orderData.customer);
       }
@@ -152,7 +155,7 @@ const OrderForm = () => {
 
   // Calculate totals when items change
   useEffect(() => {
-    if (order.items.length > 0) {
+    if (order.items && order.items.length > 0) {
       const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const discountAmount = order.items.reduce((sum, item) => {
         const itemDiscount = (item.price * item.quantity * item.discount) / 100;
@@ -247,7 +250,7 @@ const OrderForm = () => {
       
       setOrder(prev => ({
         ...prev,
-        items: [...prev.items, newItem]
+        items: [...(prev.items || []), newItem]
       }));
       
       setProductDialogOpen(false);
@@ -258,7 +261,7 @@ const OrderForm = () => {
   const removeProduct = (index) => {
     setOrder(prev => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== index)
+      items: (prev.items || []).filter((_, i) => i !== index)
     }));
   };
 
@@ -269,7 +272,7 @@ const OrderForm = () => {
     // Prepare order data for submission
     const orderData = {
       ...order,
-      items: order.items.map(item => ({
+      items: (order.items || []).map(item => ({
         product_id: item.product_id,
         quantity: item.quantity,
         price: item.price,
@@ -511,7 +514,7 @@ const OrderForm = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {order.items.length > 0 ? (
+                    {order.items && order.items.length > 0 ? (
                       order.items.map((item, index) => (
                         <TableRow key={index}>
                           <TableCell>{item.name}</TableCell>
