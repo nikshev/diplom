@@ -54,7 +54,7 @@ module.exports = {
       timeout: parseInt(process.env.FINANCE_SERVICE_TIMEOUT || '5000', 10),
     },
     analytics: {
-      url: process.env.ANALYTICS_SERVICE_URL || 'http://localhost:3006',
+      url: process.env.ANALYTICS_SERVICE_URL || 'http://localhost:8006',
       timeout: parseInt(process.env.ANALYTICS_SERVICE_TIMEOUT || '5000', 10),
     },
   },

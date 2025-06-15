@@ -28,6 +28,24 @@ const uuidValidation = param('id')
 // Routes
 
 /**
+ * @route GET /api/v1/analytics/overview
+ * @desc Get business overview analytics data
+ * @access Private
+ */
+router.get('/overview', 
+  authenticate(), 
+  authorize(['analytics:read', 'analytics:all']), 
+  // Apply throttling to overview requests (aggregates multiple data points)
+  userThrottle({ windowMs: 60 * 1000, max: 20 }), // 20 requests per minute per user
+  // Cache overview data for 5 minutes (300 seconds)
+  cacheMiddleware({ 
+    ttl: 300,
+    keyGenerator: (req) => `overview:${req.user.id}:${JSON.stringify(req.query)}` // Cache per user and query params
+  }),
+  analyticsServiceProxy
+);
+
+/**
  * @route GET /api/v1/analytics/dashboard
  * @desc Get dashboard analytics data
  * @access Private

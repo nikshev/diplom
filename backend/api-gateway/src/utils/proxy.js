@@ -29,11 +29,25 @@ const createServiceProxy = (serviceName, serviceUrl, options = {}) => {
     // Append path from the gateway to the target service
     proxyReqPathResolver: (req) => {
       const originalPath = req.originalUrl;
+      let path;
+      
       // For auth service, keep the path as is (/api/v1/auth/login)
+      if (serviceName === 'auth-service') {
+        path = originalPath;
+      }
+      // For analytics service (FastAPI), transform /api/v1/analytics/... to /api/...
+      else if (serviceName === 'analytics-service') {
+        path = originalPath.replace(/^\/api\/v1\/analytics/, '/api');
+      }
+      // For finance service, transform /api/v1/finance/... to /api/...
+      else if (serviceName === 'finance-service') {
+        path = originalPath.replace(/^\/api\/v1\/finance/, '/api');
+      }
       // For other services, convert /api/v1/... to /api/...
-      const path = serviceName === 'auth-service' 
-        ? originalPath
-        : originalPath.replace(/^\/api\/v1/, '/api');
+      else {
+        path = originalPath.replace(/^\/api\/v1/, '/api');
+      }
+      
       logger.debug(`Proxying request to ${serviceName}: ${originalPath} -> ${path}`);
       return path;
     },

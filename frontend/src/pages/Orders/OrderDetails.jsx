@@ -69,7 +69,8 @@ const OrderDetails = () => {
       return response.data;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      enabled: !!id && id !== 'undefined' // Only fetch if ID is valid
     }
   );
 
@@ -93,6 +94,24 @@ const OrderDetails = () => {
       }
     }
   );
+
+  // Validate order ID
+  if (!id || id === 'undefined') {
+    return (
+      <Box p={3}>
+        <Typography variant="h6" color="error">
+          Невірний ID замовлення
+        </Typography>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/orders')}
+          sx={{ mt: 2 }}
+        >
+          Повернутися до списку замовлень
+        </Button>
+      </Box>
+    );
+  }
 
   // Handle edit order
   const handleEditOrder = () => {

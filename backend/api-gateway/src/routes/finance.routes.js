@@ -302,4 +302,26 @@ router.get('/reports/expenses',
   financeServiceProxy
 );
 
+/**
+ * @route GET /api/v1/finance/summary
+ * @desc Get financial summary
+ * @access Private
+ */
+router.get('/summary', 
+  authenticate(), 
+  authorize(['finance:read', 'finance:all']), 
+  financeServiceProxy
+);
+
+/**
+ * @route POST /api/v1/finance/budgets
+ * @desc Create a new budget
+ * @access Private
+ */
+router.post('/budgets', 
+  authenticate(), 
+  authorize(['finance:create', 'finance:all']), 
+  financeServiceProxy
+);
+
 module.exports = router;

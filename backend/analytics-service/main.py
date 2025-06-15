@@ -165,12 +165,12 @@ app.add_middleware(
 )
 
 # Health check endpoint
-@app.get("/health")
+@app.get("/api/health")
 def health_check():
     return {"status": "ok", "service": "analytics-service"}
 
 # Analytics data endpoints
-@app.post("/data", response_model=AnalyticsDataResponse)
+@app.post("/api/analytics/data", response_model=AnalyticsDataResponse)
 def create_analytics_data(data: AnalyticsDataCreate, db: Session = Depends(get_db)):
     db_data = AnalyticsData(
         source=data.source,
@@ -184,7 +184,7 @@ def create_analytics_data(data: AnalyticsDataCreate, db: Session = Depends(get_d
     db.refresh(db_data)
     return db_data
 
-@app.get("/data", response_model=List[AnalyticsDataResponse])
+@app.get("/api/analytics/data", response_model=List[AnalyticsDataResponse])
 def get_analytics_data(
     source: Optional[str] = None,
     data_type: Optional[str] = None,
@@ -209,7 +209,7 @@ def get_analytics_data(
     return query.all()
 
 # KPI endpoints
-@app.post("/kpis", response_model=KPIResponse)
+@app.post("/api/kpis", response_model=KPIResponse)
 def create_kpi(kpi: KPICreate, db: Session = Depends(get_db)):
     db_kpi = KPI(
         name=kpi.name,
@@ -223,11 +223,11 @@ def create_kpi(kpi: KPICreate, db: Session = Depends(get_db)):
     db.refresh(db_kpi)
     return db_kpi
 
-@app.get("/kpis", response_model=List[KPIResponse])
+@app.get("/api/kpis", response_model=List[KPIResponse])
 def get_kpis(db: Session = Depends(get_db)):
     return db.query(KPI).all()
 
-@app.put("/kpis/{kpi_id}", response_model=KPIResponse)
+@app.put("/api/kpis/{kpi_id}", response_model=KPIResponse)
 def update_kpi(kpi_id: str, kpi: KPICreate, db: Session = Depends(get_db)):
     db_kpi = db.query(KPI).filter(KPI.id == kpi_id).first()
     if not db_kpi:
@@ -245,7 +245,7 @@ def update_kpi(kpi_id: str, kpi: KPICreate, db: Session = Depends(get_db)):
     return db_kpi
 
 # Report endpoints
-@app.post("/reports", response_model=ReportResponse)
+@app.post("/api/reports", response_model=ReportResponse)
 def create_report(report: ReportCreate, db: Session = Depends(get_db)):
     db_report = Report(
         name=report.name,
@@ -258,11 +258,11 @@ def create_report(report: ReportCreate, db: Session = Depends(get_db)):
     db.refresh(db_report)
     return db_report
 
-@app.get("/reports", response_model=List[ReportResponse])
+@app.get("/api/reports", response_model=List[ReportResponse])
 def get_reports(db: Session = Depends(get_db)):
     return db.query(Report).all()
 
-@app.get("/reports/{report_id}/run")
+@app.get("/api/reports/{report_id}/run")
 def run_report(report_id: str, db: Session = Depends(get_db)):
     db_report = db.query(Report).filter(Report.id == report_id).first()
     if not db_report:
@@ -278,8 +278,86 @@ def run_report(report_id: str, db: Session = Depends(get_db)):
         logger.error(f"Error running report: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error running report: {str(e)}")
 
+# Overview endpoint for business metrics
+@app.get("/api/overview")
+def get_business_overview(
+    timeframe: str = Query("month", description="Timeframe for overview data: day, week, month, year"),
+    db: Session = Depends(get_db)
+):
+    """Get business overview metrics including revenue, orders, customers, and products."""
+    
+    # Calculate date range based on timeframe
+    end_date = datetime.utcnow()
+    if timeframe == "day":
+        start_date = end_date - timedelta(days=1)
+        previous_start = start_date - timedelta(days=1)
+        previous_end = start_date
+    elif timeframe == "week":
+        start_date = end_date - timedelta(weeks=1)
+        previous_start = start_date - timedelta(weeks=1)
+        previous_end = start_date
+    elif timeframe == "year":
+        start_date = end_date - timedelta(days=365)
+        previous_start = start_date - timedelta(days=365)
+        previous_end = start_date
+    else:  # Default to month
+        start_date = end_date - timedelta(days=30)
+        previous_start = start_date - timedelta(days=30)
+        previous_end = start_date
+    
+    # Mock data for business overview (in real implementation, this would query actual data)
+    current_revenue = round(np.random.normal(50000, 10000), 2)
+    previous_revenue = round(np.random.normal(45000, 8000), 2)
+    revenue_trend = round(((current_revenue - previous_revenue) / previous_revenue) * 100, 2)
+    
+    current_orders = np.random.randint(100, 500)
+    previous_orders = np.random.randint(80, 450)
+    orders_trend = round(((current_orders - previous_orders) / previous_orders) * 100, 2)
+    
+    current_customers = np.random.randint(50, 200)
+    previous_customers = np.random.randint(40, 180)
+    customers_trend = round(((current_customers - previous_customers) / previous_customers) * 100, 2)
+    
+    current_products = np.random.randint(20, 100)
+    previous_products = np.random.randint(18, 95)
+    products_trend = round(((current_products - previous_products) / previous_products) * 100, 2)
+    
+    # Sales trend data for chart
+    dates = pd.date_range(start=start_date, end=end_date, freq='D')
+    sales_values = np.random.normal(1000, 200, size=len(dates))
+    sales_trend_data = [
+        {"date": d.strftime("%Y-%m-%d"), "value": round(v, 2)}
+        for d, v in zip(dates, sales_values)
+    ]
+    
+    return {
+        "revenue": {
+            "current": current_revenue,
+            "trend": revenue_trend,
+            "currency": "UAH"
+        },
+        "orders": {
+            "current": current_orders,
+            "trend": orders_trend
+        },
+        "customers": {
+            "current": current_customers,
+            "trend": customers_trend
+        },
+        "products": {
+            "current": current_products,
+            "trend": products_trend
+        },
+        "sales_trend": sales_trend_data,
+        "timeframe": timeframe,
+        "period": {
+            "start": start_date.isoformat(),
+            "end": end_date.isoformat()
+        }
+    }
+
 # Dashboard endpoint
-@app.get("/dashboard", response_model=DashboardData)
+@app.get("/api/dashboard", response_model=DashboardData)
 def get_dashboard_data(
     period: str = Query("month", description="Period for dashboard data: day, week, month, year"),
     db: Session = Depends(get_db)

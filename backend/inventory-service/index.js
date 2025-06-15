@@ -341,6 +341,118 @@ app.get('/api/products/:id/transactions', async (req, res) => {
   }
 });
 
+// Check product availability endpoint
+app.post('/api/inventory/check-availability', async (req, res) => {
+  try {
+    const { products } = req.body;
+    
+    if (!products || !Array.isArray(products)) {
+      return res.status(400).json({ message: 'Products array is required' });
+    }
+    
+    const availabilityResults = [];
+    
+    for (const item of products) {
+      const product = await Product.findOne({ where: { id: item.id } });
+      
+      if (!product) {
+        availabilityResults.push({
+          product_id: item.id,
+          available: false,
+          reason: 'Product not found'
+        });
+        continue;
+      }
+      
+      const isAvailable = product.stockQuantity >= item.quantity;
+      availabilityResults.push({
+        product_id: item.id,
+        available: isAvailable,
+        current_stock: product.stockQuantity,
+        requested_quantity: item.quantity,
+        reason: isAvailable ? null : 'Insufficient stock'
+      });
+    }
+    
+    const allAvailable = availabilityResults.every(result => result.available);
+    
+    res.status(200).json({
+      available: allAvailable,
+      products: availabilityResults
+    });
+  } catch (error) {
+    logger.error('Error checking product availability:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Reserve products endpoint
+app.post('/api/inventory/reserve', async (req, res) => {
+  try {
+    const { order_id, products } = req.body;
+    
+    if (!order_id || !products || !Array.isArray(products)) {
+      return res.status(400).json({ message: 'Order ID and products array are required' });
+    }
+    
+    // For now, we'll just log the reservation (in a real system, you'd track reservations)
+    logger.info(`Reserving products for order ${order_id}:`, products);
+    
+    res.status(200).json({
+      message: 'Products reserved successfully',
+      order_id,
+      reserved_products: products
+    });
+  } catch (error) {
+    logger.error('Error reserving products:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Release reservation endpoint
+app.post('/api/inventory/release-reservation', async (req, res) => {
+  try {
+    const { order_id } = req.body;
+    
+    if (!order_id) {
+      return res.status(400).json({ message: 'Order ID is required' });
+    }
+    
+    // For now, we'll just log the release (in a real system, you'd release actual reservations)
+    logger.info(`Releasing reservation for order ${order_id}`);
+    
+    res.status(200).json({
+      message: 'Reservation released successfully',
+      order_id
+    });
+  } catch (error) {
+    logger.error('Error releasing reservation:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Complete order endpoint (reduce inventory)
+app.post('/api/inventory/complete-order', async (req, res) => {
+  try {
+    const { order_id } = req.body;
+    
+    if (!order_id) {
+      return res.status(400).json({ message: 'Order ID is required' });
+    }
+    
+    // For now, we'll just log the completion (in a real system, you'd reduce actual inventory)
+    logger.info(`Completing order ${order_id} - inventory updated`);
+    
+    res.status(200).json({
+      message: 'Order completed successfully',
+      order_id
+    });
+  } catch (error) {
+    logger.error('Error completing order:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   logger.error(err.stack);

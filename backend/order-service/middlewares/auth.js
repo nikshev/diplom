@@ -19,7 +19,7 @@ const authenticate = (options = {}) => {
     
     // Attach a mock user object for downstream middleware that might expect req.user
     req.user = {
-      id: 'mock-user-id',
+      id: '00000000-0000-0000-0000-000000000001', // Valid UUID format for mock user
       email: 'mock@example.com',
       role: 'admin',
       permissions: ['*'] // Grant all permissions

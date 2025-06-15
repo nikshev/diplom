@@ -14,12 +14,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check if token exists and is valid
-    if (token) {
+    if (token && typeof token === 'string' && token.trim() !== '' && token !== 'null' && token !== 'undefined') {
       try {
         const decoded = jwt_decode(token);
         const currentTime = Date.now() / 1000;
         
-        if (decoded.exp < currentTime) {
+        if (decoded.exp && decoded.exp < currentTime) {
           // Token expired
           logout();
         } else {
@@ -35,6 +35,9 @@ export const AuthProvider = ({ children }) => {
         console.error('Invalid token:', error);
         logout();
       }
+    } else if (token) {
+      // Token exists but is invalid format, clear it
+      logout();
     }
     
     setLoading(false);

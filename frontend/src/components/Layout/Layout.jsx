@@ -51,6 +51,8 @@ const Layout = () => {
   const { user, logout } = useAuth();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  console.log('Layout rendering, current location:', location.pathname);
+
   // State for drawer
   const [mobileOpen, setMobileOpen] = useState(false);
   const [open, setOpen] = useState(true);

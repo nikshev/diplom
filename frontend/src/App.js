@@ -31,6 +31,7 @@ import ProductDetails from './pages/Inventory/ProductDetails';
 import CreateProduct from './pages/Inventory/CreateProduct';
 
 // Finance pages
+import Finance from './pages/Finance/Finance';
 import Transactions from './pages/Finance/Transactions';
 import Invoices from './pages/Finance/Invoices';
 import InvoiceDetails from './pages/Finance/InvoiceDetails';
@@ -107,26 +108,15 @@ function App() {
                 <Route path="/products/new" element={<CreateProduct />} />
                 <Route path="/products/:id" element={<ProductDetails />} />
                 
-                {/* Finance */}
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/invoices/new" element={<CreateInvoice />} />
-                <Route path="/invoices/:id" element={<InvoiceDetails />} />
                 
                 {/* Analytics */}
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/reports/:id" element={<ReportDetails />} />
                 
-                {/* User Management */}
-                <Route path="/users" element={<Users />} />
-                <Route path="/users/new" element={<CreateUser />} />
-                <Route path="/users/:id" element={<UserDetails />} />
-              </Route>
+             </Route>
               
-              {/* Redirect to login if not authenticated */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              {/* <Route path="*" element={<Navigate to="/dashboard" replace />} /> */}
             </Routes>
           </Router>
         </AuthProvider>

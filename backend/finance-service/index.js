@@ -177,12 +177,12 @@ sequelize.sync({ alter: true })
   });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', service: 'finance-service' });
 });
 
 // Create transaction endpoint
-app.post('/transactions', async (req, res) => {
+app.post('/api/transactions', async (req, res) => {
   try {
     const { type, amount, category, description, referenceId, paymentMethod } = req.body;
     
@@ -207,7 +207,7 @@ app.post('/transactions', async (req, res) => {
 });
 
 // Get all transactions endpoint
-app.get('/transactions', async (req, res) => {
+app.get('/api/transactions', async (req, res) => {
   try {
     const { startDate, endDate, type, category } = req.query;
     
@@ -249,7 +249,7 @@ app.get('/transactions', async (req, res) => {
 });
 
 // Create invoice endpoint
-app.post('/invoices', async (req, res) => {
+app.post('/api/invoices', async (req, res) => {
   try {
     const { customerId, orderId, amount, tax, dueDate, notes } = req.body;
     
@@ -284,7 +284,7 @@ app.post('/invoices', async (req, res) => {
 });
 
 // Get all invoices endpoint
-app.get('/invoices', async (req, res) => {
+app.get('/api/invoices', async (req, res) => {
   try {
     const { status, customerId } = req.query;
     
@@ -312,7 +312,7 @@ app.get('/invoices', async (req, res) => {
 });
 
 // Update invoice status endpoint
-app.patch('/invoices/:id/status', async (req, res) => {
+app.patch('/api/invoices/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -349,7 +349,7 @@ app.patch('/invoices/:id/status', async (req, res) => {
 });
 
 // Create budget endpoint
-app.post('/budgets', async (req, res) => {
+app.post('/api/budgets', async (req, res) => {
   try {
     const { name, category, amount, startDate, endDate, notes } = req.body;
     
@@ -374,7 +374,7 @@ app.post('/budgets', async (req, res) => {
 });
 
 // Get financial summary endpoint
-app.get('/summary', async (req, res) => {
+app.get('/api/summary', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     

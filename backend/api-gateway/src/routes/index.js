@@ -13,6 +13,7 @@ const metricsRoutes = require('./metrics.routes');
 const cacheRoutes = require('./cache.routes');
 const customersRoutes = require('./customers.routes');
 const productsRoutes = require('./products.routes');
+const usersRoutes = require('./users.routes');
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.use(`/${API_VERSION}/cache`, cacheRoutes);
 // Direct routes for frontend compatibility
 router.use(`/${API_VERSION}/customers`, customersRoutes);
 router.use(`/${API_VERSION}/products`, productsRoutes);
+router.use(`/${API_VERSION}/users`, usersRoutes);
 
 // API documentation route
 router.get('/', (req, res) => {
@@ -51,6 +53,7 @@ router.get('/', (req, res) => {
       `/api/${API_VERSION}/cache`,
       `/api/${API_VERSION}/customers`,
       `/api/${API_VERSION}/products`,
+      `/api/${API_VERSION}/users`,
     ],
   });
 });
