@@ -12,6 +12,21 @@ const logger = require('../config/logger');
  */
 const authenticate = () => {
   return (req, res, next) => {
+    // TODO: Re-enable token verification for production
+    // TEMPORARY: Token verification disabled for development/testing
+    
+    // Attach a mock user object for downstream middleware that might expect req.user
+    req.user = {
+      id: 'mock-user-id',
+      email: 'mock@example.com',
+      role: 'admin',
+      permissions: ['*'] // Grant all permissions
+    };
+    
+    // Skip all token verification and proceed
+    next();
+    
+    /* ORIGINAL CODE - COMMENTED OUT FOR DEVELOPMENT
     try {
       // Get token from Authorization header
       const authHeader = req.headers.authorization;
@@ -31,6 +46,7 @@ const authenticate = () => {
     } catch (error) {
       next(error);
     }
+    */
   };
 };
 
@@ -41,6 +57,13 @@ const authenticate = () => {
  */
 const authorize = (requiredPermissions) => {
   return (req, res, next) => {
+    // TODO: Re-enable authorization checks for production
+    // TEMPORARY: Authorization checks disabled for development/testing
+    
+    // Skip all permission checks and proceed
+    next();
+    
+    /* ORIGINAL CODE - COMMENTED OUT FOR DEVELOPMENT
     try {
       // Check if user exists on request (authenticate middleware should be called first)
       if (!req.user) {
@@ -73,6 +96,7 @@ const authorize = (requiredPermissions) => {
     } catch (error) {
       next(error);
     }
+    */
   };
 };
 

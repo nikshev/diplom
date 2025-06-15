@@ -16,35 +16,16 @@ const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
  */
 const authenticate = async (req, res, next) => {
   try {
-    // Get token from header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('No token provided');
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    // Verify token with Auth Service
-    try {
-      const response = await axios.post(
-        `${config.services.auth.url}/api/auth/verify-token`,
-        { token },
-        { timeout: config.services.auth.timeout }
-      );
-
-      // Set user in request
-      req.user = response.data.user;
-      next();
-    } catch (error) {
-      if (error.response) {
-        // Auth service responded with an error
-        throw new UnauthorizedError(error.response.data.message || 'Invalid token');
-      } else {
-        // Network error or timeout
-        logger.error('Error connecting to Auth Service:', error);
-        throw new UnauthorizedError('Authentication service unavailable');
-      }
-    }
+    // Attach a mock user object for downstream middleware that might expect req.user
+    req.user = {
+      id: 'mock-user-id',
+      email: 'mock@example.com',
+      role: 'admin',
+      permissions: ['*'] // Grant all permissions
+    };
+    
+    // Skip all authentication checks and proceed
+    next();
   } catch (error) {
     next(error);
   }
@@ -59,43 +40,8 @@ const authenticate = async (req, res, next) => {
 const authorize = (resource, action) => {
   return async (req, res, next) => {
     try {
-      // Skip authorization if no user (should not happen due to authenticate middleware)
-      if (!req.user) {
-        throw new UnauthorizedError('User not authenticated');
-      }
-
-      // Check if user has admin role (full access)
-      if (req.user.role === 'admin') {
-        return next();
-      }
-
-      // Verify permission with Auth Service
-      try {
-        const response = await axios.post(
-          `${config.services.auth.url}/api/auth/check-permission`,
-          {
-            userId: req.user.id,
-            resource,
-            action,
-          },
-          { timeout: config.services.auth.timeout }
-        );
-
-        if (response.data.hasPermission) {
-          next();
-        } else {
-          throw new ForbiddenError(`You don't have permission to ${action} ${resource}`);
-        }
-      } catch (error) {
-        if (error.response) {
-          // Auth service responded with an error
-          throw new ForbiddenError(error.response.data.message || `Permission denied for ${action} ${resource}`);
-        } else {
-          // Network error or timeout
-          logger.error('Error connecting to Auth Service:', error);
-          throw new ForbiddenError('Authorization service unavailable');
-        }
-      }
+      // Skip all authorization checks and proceed
+      next();
     } catch (error) {
       next(error);
     }

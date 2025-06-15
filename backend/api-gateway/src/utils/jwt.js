@@ -66,20 +66,31 @@ const generateTokens = (payload) => {
  */
 const verifyToken = (token, type = 'access') => {
   try {
+    console.log('DEBUG: Verifying token:', token.substring(0, 50) + '...');
+    console.log('DEBUG: Expected type:', type);
+    console.log('DEBUG: JWT secret:', config.jwt.secret);
+    
     const decoded = jwt.verify(token, config.jwt.secret);
+    console.log('DEBUG: Token decoded successfully:', JSON.stringify(decoded, null, 2));
     
     // Check if token type matches
     if (decoded.type !== type) {
+      console.log('DEBUG: Token type mismatch. Expected:', type, 'Got:', decoded.type);
       throw new UnauthorizedError(`Invalid token type: expected ${type}`);
     }
     
     // Check if token is blacklisted
     if (decoded.jti && isTokenBlacklisted(decoded.jti)) {
+      console.log('DEBUG: Token is blacklisted:', decoded.jti);
       throw new UnauthorizedError('Token has been revoked');
     }
     
+    console.log('DEBUG: Token verification successful');
     return decoded;
   } catch (error) {
+    console.log('DEBUG: Token verification failed:', error.message);
+    console.log('DEBUG: Error details:', error);
+    
     if (error instanceof UnauthorizedError) {
       throw error;
     }

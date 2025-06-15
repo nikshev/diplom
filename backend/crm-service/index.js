@@ -3,17 +3,21 @@
  */
 
 require('dotenv').config();
-const { models } = require('./models');
 const app = require('./app');
 const config = require('./config');
 const logger = require('./config/logger');
-const db = require('./models');
+const { initDbInstance } = require('./db-instance');
 
 // Initialize database and start server
 async function start() {
   try {
-    // Initialize database
-    const models = await db.init();
+    // Run migrations first
+    const { migrate } = require('./migrations');
+    await migrate();
+    logger.info('Migrations completed successfully');
+    
+    // Initialize database instance
+    const models = await initDbInstance();
     logger.info('Database initialized');
 
     // Initialize services

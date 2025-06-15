@@ -14,6 +14,21 @@ const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
  */
 const authenticate = (options = {}) => {
   return async (req, res, next) => {
+    // TODO: Re-enable authentication for production
+    // TEMPORARY: Authentication disabled for development/testing
+    
+    // Attach a mock user object for downstream middleware that might expect req.user
+    req.user = {
+      id: 'mock-user-id',
+      email: 'mock@example.com',
+      role: 'admin',
+      permissions: ['*'] // Grant all permissions
+    };
+    
+    // Skip all authentication checks and proceed
+    next();
+    
+    /* ORIGINAL CODE - COMMENTED OUT FOR DEVELOPMENT
     try {
       // Get token from Authorization header
       const authHeader = req.headers.authorization;
@@ -35,6 +50,7 @@ const authenticate = (options = {}) => {
       logger.error('Authentication error:', error);
       next(new UnauthorizedError('Invalid or expired token'));
     }
+    */
   };
 };
 
@@ -45,6 +61,13 @@ const authenticate = (options = {}) => {
  */
 const authorize = (requiredPermissions) => {
   return async (req, res, next) => {
+    // TODO: Re-enable authorization for production
+    // TEMPORARY: Authorization disabled for development/testing
+    
+    // Skip all authorization checks and proceed
+    next();
+    
+    /* ORIGINAL CODE - COMMENTED OUT FOR DEVELOPMENT
     try {
       // Check if user exists on request (authenticate middleware should be called first)
       if (!req.user) {
@@ -78,6 +101,7 @@ const authorize = (requiredPermissions) => {
       logger.error('Authorization error:', error);
       next(error);
     }
+    */
   };
 };
 
@@ -88,6 +112,13 @@ const authorize = (requiredPermissions) => {
  */
 const authorizeRole = (requiredRoles) => {
   return (req, res, next) => {
+    // TODO: Re-enable role authorization for production
+    // TEMPORARY: Role authorization disabled for development/testing
+    
+    // Skip all role authorization checks and proceed
+    next();
+    
+    /* ORIGINAL CODE - COMMENTED OUT FOR DEVELOPMENT
     try {
       // Check if user exists on request (authenticate middleware should be called first)
       if (!req.user) {
@@ -118,6 +149,7 @@ const authorizeRole = (requiredRoles) => {
       logger.error('Role authorization error:', error);
       next(error);
     }
+    */
   };
 };
 

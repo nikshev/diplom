@@ -4,8 +4,8 @@
 
 const { Op } = require('sequelize');
 const logger = require('../config/logger');
-const config = require('../config');
 const { NotFoundError, BadRequestError } = require('../utils/errors');
+const { getDbInstance } = require('../db-instance');
 
 /**
  * Interaction service
@@ -13,12 +13,21 @@ const { NotFoundError, BadRequestError } = require('../utils/errors');
 class InteractionService {
   /**
    * Constructor
-   * @param {Object} db - Database models
    */
-  constructor(db) {
-    this.db = db;
-    this.Interaction = db.Interaction;
-    this.Customer = db.Customer;
+  constructor() {
+    // Models will be accessed via getDbInstance()
+  }
+
+  /**
+   * Get database models
+   * @returns {Object} Database models
+   */
+  getModels() {
+    const db = getDbInstance();
+    if (!db) {
+      throw new Error('Database not initialized');
+    }
+    return db;
   }
 
   /**
@@ -38,8 +47,11 @@ class InteractionService {
       sortOrder = 'DESC',
     } = options;
 
+    const db = this.getModels();
+    const { Interaction, Customer } = db;
+
     // Check if customer exists
-    const customer = await this.Customer.findByPk(customerId);
+    const customer = await Customer.findByPk(customerId);
     if (!customer) {
       throw new NotFoundError(`Customer with ID ${customerId} not found`);
     }
@@ -67,7 +79,7 @@ class InteractionService {
     }
 
     // Get interactions with pagination
-    const { count, rows } = await this.Interaction.findAndCountAll({
+    const { count, rows } = await Interaction.findAndCountAll({
       where,
       order: [[sortBy, sortOrder]],
       limit,
@@ -98,10 +110,13 @@ class InteractionService {
    * @returns {Promise<Object>} Interaction
    */
   async getInteractionById(id) {
-    const interaction = await this.Interaction.findByPk(id, {
+    const db = this.getModels();
+    const { Interaction, Customer } = db;
+
+    const interaction = await Interaction.findByPk(id, {
       include: [
         {
-          model: this.Customer,
+          model: Customer,
           as: 'customer',
         },
       ],
@@ -120,10 +135,13 @@ class InteractionService {
    * @returns {Promise<Object>} Created interaction
    */
   async createInteraction(interactionData) {
+    const db = this.getModels();
+    const { Interaction, Customer } = db;
+
     const { customer_id, type } = interactionData;
 
     // Check if customer exists
-    const customer = await this.Customer.findByPk(customer_id);
+    const customer = await Customer.findByPk(customer_id);
     if (!customer) {
       throw new NotFoundError(`Customer with ID ${customer_id} not found`);
     }
@@ -134,7 +152,7 @@ class InteractionService {
     }
 
     // Create interaction
-    const interaction = await this.Interaction.create(interactionData);
+    const interaction = await Interaction.create(interactionData);
 
     // Return interaction with customer
     return this.getInteractionById(interaction.id);
@@ -147,6 +165,9 @@ class InteractionService {
    * @returns {Promise<Object>} Updated interaction
    */
   async updateInteraction(id, interactionData) {
+    const db = this.getModels();
+    const { Interaction } = db;
+
     const interaction = await this.getInteractionById(id);
     const { type } = interactionData;
 
@@ -168,6 +189,9 @@ class InteractionService {
    * @returns {Promise<boolean>} Success
    */
   async deleteInteraction(id) {
+    const db = this.getModels();
+    const { Interaction } = db;
+
     const interaction = await this.getInteractionById(id);
 
     // Delete interaction
@@ -182,6 +206,9 @@ class InteractionService {
    * @returns {Promise<Object>} Interactions with pagination
    */
   async getInteractionsByDateRange(options = {}) {
+    const db = this.getModels();
+    const { Interaction, Customer } = db;
+
     const {
       page = 1,
       limit = 10,
@@ -220,11 +247,11 @@ class InteractionService {
     }
 
     // Get interactions with pagination
-    const { count, rows } = await this.Interaction.findAndCountAll({
+    const { count, rows } = await Interaction.findAndCountAll({
       where,
       include: [
         {
-          model: this.Customer,
+          model: Customer,
           as: 'customer',
         },
       ],
@@ -257,6 +284,9 @@ class InteractionService {
    * @returns {Promise<Object>} Interaction statistics
    */
   async getInteractionStatistics(options = {}) {
+    const db = this.getModels();
+    const { Interaction } = db;
+
     const { startDate, endDate, userId } = options;
     const where = {};
 
@@ -280,10 +310,10 @@ class InteractionService {
     }
 
     // Count interactions by type
-    const interactionsByType = await this.Interaction.findAll({
+    const interactionsByType = await Interaction.findAll({
       attributes: [
         'type',
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
       ],
       where,
       group: ['type'],
@@ -291,22 +321,22 @@ class InteractionService {
     });
 
     // Count interactions by date
-    const interactionsByDate = await this.Interaction.findAll({
+    const interactionsByDate = await Interaction.findAll({
       attributes: [
-        [this.db.sequelize.fn('DATE', this.db.sequelize.col('date')), 'date'],
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [db.sequelize.fn('DATE', db.sequelize.col('date')), 'date'],
+        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
       ],
       where,
-      group: [this.db.sequelize.fn('DATE', this.db.sequelize.col('date'))],
-      order: [[this.db.sequelize.fn('DATE', this.db.sequelize.col('date')), 'ASC']],
+      group: [db.sequelize.fn('DATE', db.sequelize.col('date'))],
+      order: [[db.sequelize.fn('DATE', db.sequelize.col('date')), 'ASC']],
       raw: true,
     });
 
     // Count interactions by user
-    const interactionsByUser = await this.Interaction.findAll({
+    const interactionsByUser = await Interaction.findAll({
       attributes: [
         'user_id',
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
       ],
       where,
       group: ['user_id'],
@@ -337,6 +367,9 @@ class InteractionService {
    * @returns {Promise<Array>} Matching interactions
    */
   async searchInteractions(query, options = {}) {
+    const db = this.getModels();
+    const { Interaction, Customer } = db;
+
     const { limit = 10, customerId } = options;
 
     if (!query || query.trim().length < 2) {
@@ -355,11 +388,11 @@ class InteractionService {
       where.customer_id = customerId;
     }
 
-    const interactions = await this.Interaction.findAll({
+    const interactions = await Interaction.findAll({
       where,
       include: [
         {
-          model: this.Customer,
+          model: Customer,
           as: 'customer',
         },
       ],

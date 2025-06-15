@@ -5,6 +5,7 @@
 const { Op } = require('sequelize');
 const logger = require('../config/logger');
 const { NotFoundError, BadRequestError } = require('../utils/errors');
+const { getDbInstance } = require('../db-instance');
 
 /**
  * Contact service
@@ -12,12 +13,21 @@ const { NotFoundError, BadRequestError } = require('../utils/errors');
 class ContactService {
   /**
    * Constructor
-   * @param {Object} db - Database models
    */
-  constructor(db) {
-    this.db = db;
-    this.Contact = db.Contact;
-    this.Customer = db.Customer;
+  constructor() {
+    // Models will be accessed via getDbInstance()
+  }
+
+  /**
+   * Get database models
+   * @returns {Object} Database models
+   */
+  getModels() {
+    const db = getDbInstance();
+    if (!db) {
+      throw new Error('Database not initialized');
+    }
+    return db;
   }
 
   /**
@@ -26,13 +36,15 @@ class ContactService {
    * @returns {Promise<Array>} Contacts
    */
   async getContactsByCustomerId(customerId) {
+    const { Contact, Customer } = this.getModels();
+
     // Check if customer exists
-    const customer = await this.Customer.findByPk(customerId);
+    const customer = await Customer.findByPk(customerId);
     if (!customer) {
       throw new NotFoundError(`Customer with ID ${customerId} not found`);
     }
 
-    const contacts = await this.Contact.findAll({
+    const contacts = await Contact.findAll({
       where: { customer_id: customerId },
       order: [['is_primary', 'DESC'], ['created_at', 'DESC']],
     });
@@ -46,10 +58,12 @@ class ContactService {
    * @returns {Promise<Object>} Contact
    */
   async getContactById(id) {
-    const contact = await this.Contact.findByPk(id, {
+    const { Contact, Customer } = this.getModels();
+
+    const contact = await Contact.findByPk(id, {
       include: [
         {
-          model: this.Customer,
+          model: Customer,
           as: 'customer',
         },
       ],
@@ -68,20 +82,21 @@ class ContactService {
    * @returns {Promise<Object>} Created contact
    */
   async createContact(contactData) {
+    const { Contact, Customer } = this.getModels();
     const { customer_id } = contactData;
 
     // Check if customer exists
-    const customer = await this.Customer.findByPk(customer_id);
+    const customer = await Customer.findByPk(customer_id);
     if (!customer) {
       throw new NotFoundError(`Customer with ID ${customer_id} not found`);
     }
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Create contact
-      const contact = await this.Contact.create(contactData, { transaction });
+      const contact = await Contact.create(contactData, { transaction });
 
       // Commit transaction
       await transaction.commit();
@@ -103,10 +118,12 @@ class ContactService {
    * @returns {Promise<Object>} Updated contact
    */
   async updateContact(id, contactData) {
+    const { Contact } = this.getModels();
+
     const contact = await this.getContactById(id);
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Update contact
@@ -131,12 +148,14 @@ class ContactService {
    * @returns {Promise<boolean>} Success
    */
   async deleteContact(id) {
+    const { Contact } = this.getModels();
+
     const contact = await this.getContactById(id);
 
     // Check if contact is primary
     if (contact.is_primary) {
       // Find another contact to make primary
-      const anotherContact = await this.Contact.findOne({
+      const anotherContact = await Contact.findOne({
         where: {
           customer_id: contact.customer_id,
           id: { [Op.ne]: id },
@@ -162,6 +181,8 @@ class ContactService {
    * @returns {Promise<Object>} Updated contact
    */
   async setPrimaryContact(id) {
+    const { Contact } = this.getModels();
+
     const contact = await this.getContactById(id);
 
     // If already primary, nothing to do
@@ -170,11 +191,11 @@ class ContactService {
     }
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Set all contacts for this customer as non-primary
-      await this.Contact.update(
+      await Contact.update(
         { is_primary: false },
         {
           where: { customer_id: contact.customer_id },
@@ -205,6 +226,8 @@ class ContactService {
    * @returns {Promise<Array>} Matching contacts
    */
   async searchContacts(query, options = {}) {
+    const { Contact, Customer } = this.getModels();
+
     const { limit = 10, customerId } = options;
 
     if (!query || query.trim().length < 2) {
@@ -226,11 +249,11 @@ class ContactService {
       where.customer_id = customerId;
     }
 
-    const contacts = await this.Contact.findAll({
+    const contacts = await Contact.findAll({
       where,
       include: [
         {
-          model: this.Customer,
+          model: Customer,
           as: 'customer',
         },
       ],

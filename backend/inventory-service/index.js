@@ -143,7 +143,7 @@ app.get('/health', (req, res) => {
 });
 
 // Create product endpoint
-app.post('/products', async (req, res) => {
+app.post('/api/products', async (req, res) => {
   try {
     const { name, sku, description, category, price, costPrice, stockQuantity, reorderLevel } = req.body;
     
@@ -186,7 +186,7 @@ app.post('/products', async (req, res) => {
 });
 
 // Get all products endpoint
-app.get('/products', async (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.findAll();
     
@@ -198,7 +198,7 @@ app.get('/products', async (req, res) => {
 });
 
 // Get product by ID endpoint
-app.get('/products/:id', async (req, res) => {
+app.get('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -218,7 +218,7 @@ app.get('/products/:id', async (req, res) => {
 });
 
 // Update product endpoint
-app.put('/products/:id', async (req, res) => {
+app.put('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, category, price, costPrice, reorderLevel, status } = req.body;
@@ -251,7 +251,7 @@ app.put('/products/:id', async (req, res) => {
 });
 
 // Update stock quantity endpoint
-app.post('/products/:id/stock', async (req, res) => {
+app.post('/api/products/:id/stock', async (req, res) => {
   try {
     const { id } = req.params;
     const { type, quantity, referenceId, notes } = req.body;
@@ -300,7 +300,7 @@ app.post('/products/:id/stock', async (req, res) => {
 });
 
 // Get low stock products endpoint
-app.get('/products/low-stock', async (req, res) => {
+app.get('/api/products/low-stock', async (req, res) => {
   try {
     const products = await Product.findAll({
       where: {
@@ -319,7 +319,7 @@ app.get('/products/low-stock', async (req, res) => {
 });
 
 // Get inventory transactions for a product endpoint
-app.get('/products/:id/transactions', async (req, res) => {
+app.get('/api/products/:id/transactions', async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -348,6 +348,21 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  logger.info(`Inventory Service running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    // Run migrations first
+    const { migrate } = require('./migrations');
+    await migrate();
+    logger.info('Migrations completed successfully');
+    
+    // Start server
+    app.listen(PORT, () => {
+      logger.info(`Inventory Service running on port ${PORT}`);
+    });
+  } catch (error) {
+    logger.error('Unable to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

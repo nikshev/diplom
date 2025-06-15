@@ -450,6 +450,21 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  logger.info(`Finance Service running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    // Run migrations first
+    const { migrate } = require('./migrations');
+    await migrate();
+    logger.info('Migrations completed successfully');
+    
+    // Start server
+    app.listen(PORT, () => {
+      logger.info(`Finance Service running on port ${PORT}`);
+    });
+  } catch (error) {
+    logger.error('Unable to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

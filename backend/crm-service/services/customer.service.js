@@ -6,6 +6,7 @@ const { Op } = require('sequelize');
 const logger = require('../config/logger');
 const config = require('../config');
 const { NotFoundError, BadRequestError } = require('../utils/errors');
+const { getDbInstance } = require('../db-instance');
 
 /**
  * Customer service
@@ -13,13 +14,21 @@ const { NotFoundError, BadRequestError } = require('../utils/errors');
 class CustomerService {
   /**
    * Constructor
-   * @param {Object} db - Database models
    */
-  constructor(db) {
-    this.db = db;
-    this.Customer = db.Customer;
-    this.Contact = db.Contact;
-    this.Interaction = db.Interaction;
+  constructor() {
+    // Models will be accessed via getDbInstance()
+  }
+
+  /**
+   * Get database models
+   * @returns {Object} Database models
+   */
+  getModels() {
+    const db = getDbInstance();
+    if (!db) {
+      throw new Error('Database not initialized');
+    }
+    return db;
   }
 
   /**
@@ -60,11 +69,12 @@ class CustomerService {
     }
 
     // Get customers with pagination
-    const { count, rows } = await this.Customer.findAndCountAll({
+    const { Customer, Contact } = this.getModels();
+    const { count, rows } = await Customer.findAndCountAll({
       where,
       include: [
         {
-          model: this.Contact,
+          model: Contact,
           as: 'contacts',
           required: false,
           where: {
@@ -103,10 +113,11 @@ class CustomerService {
    * @returns {Promise<Object>} Customer
    */
   async getCustomerById(id) {
-    const customer = await this.Customer.findByPk(id, {
+    const { Customer, Contact } = this.getModels();
+    const customer = await Customer.findByPk(id, {
       include: [
         {
-          model: this.Contact,
+          model: Contact,
           as: 'contacts',
         },
       ],
@@ -125,14 +136,15 @@ class CustomerService {
    * @returns {Promise<Object>} Created customer
    */
   async createCustomer(customerData) {
+    const { Customer, Contact } = this.getModels();
     const { contacts, ...customerDetails } = customerData;
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Create customer
-      const customer = await this.Customer.create(customerDetails, { transaction });
+      const customer = await Customer.create(customerDetails, { transaction });
 
       // Create contacts if provided
       if (contacts && Array.isArray(contacts) && contacts.length > 0) {
@@ -142,7 +154,7 @@ class CustomerService {
           customer_id: customer.id,
         }));
 
-        await this.Contact.bulkCreate(customerContacts, { transaction });
+        await Contact.bulkCreate(customerContacts, { transaction });
       }
 
       // Commit transaction
@@ -165,11 +177,12 @@ class CustomerService {
    * @returns {Promise<Object>} Updated customer
    */
   async updateCustomer(id, customerData) {
+    const { Customer, Contact } = this.getModels();
     const customer = await this.getCustomerById(id);
     const { contacts, ...customerDetails } = customerData;
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Update customer
@@ -180,7 +193,7 @@ class CustomerService {
         for (const contact of contacts) {
           if (contact.id) {
             // Update existing contact
-            const existingContact = await this.Contact.findOne({
+            const existingContact = await Contact.findOne({
               where: {
                 id: contact.id,
                 customer_id: id,
@@ -193,7 +206,7 @@ class CustomerService {
             }
           } else {
             // Create new contact
-            await this.Contact.create({
+            await Contact.create({
               ...contact,
               customer_id: id,
             }, { transaction });
@@ -220,20 +233,21 @@ class CustomerService {
    * @returns {Promise<boolean>} Success
    */
   async deleteCustomer(id) {
+    const { Customer, Contact, Interaction } = this.getModels();
     const customer = await this.getCustomerById(id);
 
     // Start transaction
-    const transaction = await this.db.sequelize.transaction();
+    const transaction = await this.getModels().sequelize.transaction();
 
     try {
       // Delete contacts
-      await this.Contact.destroy({
+      await Contact.destroy({
         where: { customer_id: id },
         transaction,
       });
 
       // Delete interactions
-      await this.Interaction.destroy({
+      await Interaction.destroy({
         where: { customer_id: id },
         transaction,
       });
@@ -293,15 +307,16 @@ class CustomerService {
     await this.getCustomerById(id);
 
     // Count interactions
-    const interactionsCount = await this.Interaction.count({
+    const { Interaction } = this.getModels();
+    const interactionsCount = await Interaction.count({
       where: { customer_id: id },
     });
 
     // Count interactions by type
-    const interactionsByType = await this.Interaction.findAll({
+    const interactionsByType = await Interaction.findAll({
       attributes: [
         'type',
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [this.getModels().sequelize.fn('COUNT', this.getModels().sequelize.col('id')), 'count'],
       ],
       where: { customer_id: id },
       group: ['type'],
@@ -340,7 +355,8 @@ class CustomerService {
       throw new BadRequestError('Search query must be at least 2 characters long');
     }
 
-    const customers = await this.Customer.findAll({
+    const { Customer, Contact } = this.getModels();
+    const customers = await Customer.findAll({
       where: {
         [Op.or]: [
           { first_name: { [Op.iLike]: `%${query}%` } },
@@ -351,7 +367,7 @@ class CustomerService {
       },
       include: [
         {
-          model: this.Contact,
+          model: Contact,
           as: 'contacts',
           required: false,
           where: {
@@ -372,20 +388,21 @@ class CustomerService {
    */
   async getCustomerSegments() {
     // Get customer counts by status
-    const statusCounts = await this.Customer.findAll({
+    const { Customer } = this.getModels();
+    const statusCounts = await Customer.findAll({
       attributes: [
         'status',
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [this.getModels().sequelize.fn('COUNT', this.getModels().sequelize.col('id')), 'count'],
       ],
       group: ['status'],
       raw: true,
     });
 
     // Get customer counts by type
-    const typeCounts = await this.Customer.findAll({
+    const typeCounts = await Customer.findAll({
       attributes: [
         'type',
-        [this.db.sequelize.fn('COUNT', this.db.sequelize.col('id')), 'count'],
+        [this.getModels().sequelize.fn('COUNT', this.getModels().sequelize.col('id')), 'count'],
       ],
       group: ['type'],
       raw: true,

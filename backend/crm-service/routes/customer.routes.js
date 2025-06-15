@@ -6,6 +6,7 @@ const express = require('express');
 const { body, param, query } = require('express-validator');
 const validate = require('../middlewares/validator');
 const { authorize } = require('../middlewares/auth');
+const { transformCustomerData } = require('../middlewares/transform');
 const config = require('../config');
 
 const router = express.Router();
@@ -65,15 +66,17 @@ module.exports = (customerController) => {
   router.post(
     '/',
     authorize('customers', 'create'),
+    transformCustomerData,
     [
       body('first_name').notEmpty().withMessage('First name is required'),
       body('last_name').notEmpty().withMessage('Last name is required'),
-      body('email').isEmail().withMessage('Email must be valid'),
+      body('email').optional().isEmail().withMessage('Email must be valid'),
       body('phone').optional().isString().withMessage('Phone must be a string'),
-      body('status').isIn(Object.values(config.customerStatuses)).withMessage('Invalid status'),
-      body('type').isIn(Object.values(config.customerTypes)).withMessage('Invalid type'),
       body('company_name').optional().isString().withMessage('Company name must be a string'),
-      body('address').optional().isObject().withMessage('Address must be an object'),
+      body('tax_id').optional().isString().withMessage('Tax ID must be a string'),
+      body('status').optional().isIn(Object.values(config.customerStatuses)).withMessage('Invalid status'),
+      body('type').optional().isIn(Object.values(config.customerTypes)).withMessage('Invalid type'),
+      body('address').optional().isString().withMessage('Address must be a string'),
       body('notes').optional().isString().withMessage('Notes must be a string'),
       body('contacts').optional().isArray().withMessage('Contacts must be an array'),
       body('contacts.*.first_name').optional().isString().withMessage('Contact first name must be a string'),

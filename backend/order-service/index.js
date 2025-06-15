@@ -44,6 +44,11 @@ app.get('/health', (req, res) => {
 // Initialize database and start server
 const startServer = async () => {
   try {
+    // Run migrations first
+    const { migrate } = require('./migrations');
+    await migrate();
+    logger.info('Migrations completed successfully');
+    
     // Initialize database and models
     const db = await initModels();
     logger.info('Database connection established successfully');
