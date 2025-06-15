@@ -74,7 +74,7 @@ const createProductRoutes = (productController) => {
    */
   router.post(
     '/',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       body('name').notEmpty().withMessage('Name is required').isString().withMessage('Name must be a string'),
       body('description').optional().isString().withMessage('Description must be a string'),
@@ -100,7 +100,7 @@ const createProductRoutes = (productController) => {
    */
   router.put(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Product ID must be an integer'),
       body('name').optional().isString().withMessage('Name must be a string'),
@@ -127,7 +127,7 @@ const createProductRoutes = (productController) => {
    */
   router.delete(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Product ID must be an integer'),
       validator,
@@ -142,7 +142,7 @@ const createProductRoutes = (productController) => {
    */
   router.patch(
     '/:id/price',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Product ID must be an integer'),
       body('price').notEmpty().withMessage('Price is required').isFloat({ min: 0 }).withMessage('Price must be a non-negative number'),
@@ -158,7 +158,7 @@ const createProductRoutes = (productController) => {
    */
   router.patch(
     '/:id/status',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Product ID must be an integer'),
       body('isActive').notEmpty().withMessage('isActive is required').isBoolean().withMessage('isActive must be a boolean'),
@@ -190,7 +190,7 @@ const createProductRoutes = (productController) => {
    */
   router.get(
     '/low-stock',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('warehouseId').optional().isInt().withMessage('Warehouse ID must be an integer'),
       query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),

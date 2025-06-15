@@ -55,7 +55,7 @@ const createCategoryRoutes = (categoryController) => {
    */
   router.post(
     '/',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       body('name').notEmpty().withMessage('Name is required').isString().withMessage('Name must be a string'),
       body('description').optional().isString().withMessage('Description must be a string'),
@@ -73,7 +73,7 @@ const createCategoryRoutes = (categoryController) => {
    */
   router.put(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Category ID must be an integer'),
       body('name').optional().isString().withMessage('Name must be a string'),
@@ -92,7 +92,7 @@ const createCategoryRoutes = (categoryController) => {
    */
   router.delete(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Category ID must be an integer'),
       validator,

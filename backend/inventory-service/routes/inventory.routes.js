@@ -22,7 +22,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
       query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
@@ -43,7 +43,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/:id',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       validator,
@@ -58,7 +58,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/product/:productId/warehouse/:warehouseId',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('productId').isInt().withMessage('Product ID must be an integer'),
       param('warehouseId').isInt().withMessage('Warehouse ID must be an integer'),
@@ -74,7 +74,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.post(
     '/',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       body('product_id').notEmpty().withMessage('Product ID is required').isInt().withMessage('Product ID must be an integer'),
       body('warehouse_id').notEmpty().withMessage('Warehouse ID is required').isInt().withMessage('Warehouse ID must be an integer'),
@@ -92,7 +92,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.put(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('quantity').optional().isInt({ min: 0 }).withMessage('Quantity must be a non-negative integer'),
@@ -112,7 +112,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.patch(
     '/:id/adjust',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('quantity').notEmpty().withMessage('Quantity is required').isInt().withMessage('Quantity must be an integer'),
@@ -129,7 +129,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.post(
     '/:id/transfer',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('targetWarehouseId').notEmpty().withMessage('Target warehouse ID is required').isInt().withMessage('Target warehouse ID must be an integer'),
@@ -147,7 +147,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.post(
     '/:id/reserve',
-    auth(['admin', 'inventory_manager', 'order_manager']),
+    auth.authorize(['admin', 'inventory_manager', 'order_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('quantity').notEmpty().withMessage('Quantity is required').isInt({ min: 1 }).withMessage('Quantity must be a positive integer'),
@@ -164,7 +164,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.post(
     '/:id/release',
-    auth(['admin', 'inventory_manager', 'order_manager']),
+    auth.authorize(['admin', 'inventory_manager', 'order_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('quantity').notEmpty().withMessage('Quantity is required').isInt({ min: 1 }).withMessage('Quantity must be a positive integer'),
@@ -181,7 +181,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.post(
     '/:id/fulfill',
-    auth(['admin', 'inventory_manager', 'order_manager']),
+    auth.authorize(['admin', 'inventory_manager', 'order_manager']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       body('quantity').notEmpty().withMessage('Quantity is required').isInt({ min: 1 }).withMessage('Quantity must be a positive integer'),
@@ -198,7 +198,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/:id/transactions',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Inventory ID must be an integer'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -218,7 +218,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/low-stock',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('warehouseId').optional().isInt().withMessage('Warehouse ID must be an integer'),
       query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
@@ -234,7 +234,7 @@ const createInventoryRoutes = (inventoryController) => {
    */
   router.get(
     '/summary',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     inventoryController.getInventorySummary
   );
 

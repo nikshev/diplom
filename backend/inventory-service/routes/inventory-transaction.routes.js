@@ -22,7 +22,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
       query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
@@ -47,7 +47,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/:id',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Transaction ID must be an integer'),
       validator,
@@ -62,7 +62,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.post(
     '/',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       body('inventory_id').notEmpty().withMessage('Inventory ID is required').isInt().withMessage('Inventory ID must be an integer'),
       body('type').notEmpty().withMessage('Type is required').isString().withMessage('Type must be a string'),
@@ -82,7 +82,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/product/:productId',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('productId').isInt().withMessage('Product ID must be an integer'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -102,7 +102,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/warehouse/:warehouseId',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('warehouseId').isInt().withMessage('Warehouse ID must be an integer'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -123,7 +123,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/inventory/:inventoryId',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('inventoryId').isInt().withMessage('Inventory ID must be an integer'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -143,7 +143,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/type/:type',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('type').isString().withMessage('Type must be a string'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -164,7 +164,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/date-range',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('startDate').notEmpty().withMessage('Start date is required').isISO8601().withMessage('Start date must be a valid ISO8601 date'),
       query('endDate').notEmpty().withMessage('End date is required').isISO8601().withMessage('End date must be a valid ISO8601 date'),
@@ -185,7 +185,7 @@ const createInventoryTransactionRoutes = (inventoryTransactionController) => {
    */
   router.get(
     '/summary',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('startDate').notEmpty().withMessage('Start date is required').isISO8601().withMessage('Start date must be a valid ISO8601 date'),
       query('endDate').notEmpty().withMessage('End date is required').isISO8601().withMessage('End date must be a valid ISO8601 date'),

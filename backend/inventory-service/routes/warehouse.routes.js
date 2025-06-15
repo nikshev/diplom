@@ -22,7 +22,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.get(
     '/',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       query('includeInactive').optional().isBoolean().withMessage('includeInactive must be a boolean'),
       query('search').optional().isString().withMessage('search must be a string'),
@@ -39,7 +39,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.get(
     '/:id',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Warehouse ID must be an integer'),
       query('includeInventory').optional().isBoolean().withMessage('includeInventory must be a boolean'),
@@ -56,7 +56,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.post(
     '/',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       body('name').notEmpty().withMessage('Name is required').isString().withMessage('Name must be a string'),
       body('description').optional().isString().withMessage('Description must be a string'),
@@ -83,7 +83,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.put(
     '/:id',
-    auth(['admin', 'inventory_manager']),
+    auth.authorize(['admin', 'inventory_manager']),
     [
       param('id').isInt().withMessage('Warehouse ID must be an integer'),
       body('name').optional().isString().withMessage('Name must be a string'),
@@ -111,7 +111,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.delete(
     '/:id',
-    auth(['admin']),
+    auth.authorize(['admin']),
     [
       param('id').isInt().withMessage('Warehouse ID must be an integer'),
       validator,
@@ -126,7 +126,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.get(
     '/:id/inventory',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Warehouse ID must be an integer'),
       query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
@@ -147,7 +147,7 @@ const createWarehouseRoutes = (warehouseController) => {
    */
   router.get(
     '/:id/stats',
-    auth(['admin', 'inventory_manager', 'inventory_viewer']),
+    auth.authorize(['admin', 'inventory_manager', 'inventory_viewer']),
     [
       param('id').isInt().withMessage('Warehouse ID must be an integer'),
       validator,

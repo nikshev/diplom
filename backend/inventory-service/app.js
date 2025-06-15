@@ -40,7 +40,7 @@ const initApp = async () => {
   // Connect to database
   const sequelize = new Sequelize(
     config.database.name,
-    config.database.username,
+    config.database.user,
     config.database.password,
     {
       host: config.database.host,
@@ -65,7 +65,7 @@ const initApp = async () => {
   }
 
   // Initialize models with sequelize
-  const db = models(sequelize);
+  const db = await models.init(sequelize);
 
   // Initialize services
   const services = {
