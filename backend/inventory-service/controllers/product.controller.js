@@ -38,6 +38,8 @@ class ProductController {
    */
   async getProducts(req, res, next) {
     try {
+      logger.info('ProductController.getProducts called with query:', req.query);
+      
       const options = {
         page: parseInt(req.query.page, 10) || 1,
         limit: parseInt(req.query.limit, 10) || 10,
@@ -51,7 +53,14 @@ class ProductController {
         includeInventory: req.query.includeInventory === 'true',
       };
 
+      logger.info('ProductController.getProducts options:', options);
+
       const result = await this.productService.getProducts(options);
+
+      logger.info('ProductController.getProducts result:', { 
+        productsCount: result.products.length, 
+        total: result.pagination.total 
+      });
 
       res.status(StatusCodes.OK).json(result);
     } catch (error) {
