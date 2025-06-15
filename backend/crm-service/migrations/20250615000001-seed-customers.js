@@ -92,8 +92,11 @@ module.exports = {
       contacts.push({
         id: uuidv4(),
         customer_id: customer.id,
-        type: ['phone', 'email', 'address'][i % 3],
-        value: i % 3 === 0 ? customer.phone : i % 3 === 1 ? customer.email : customer.address,
+        first_name: `Контакт${i + 1}`,
+        last_name: `Особа${i + 1}`,
+        position: ['Менеджер', 'Директор', 'Координатор', 'Спеціаліст'][i % 4],
+        email: `contact${i + 1}@${customer.email.split('@')[1]}`,
+        phone: `+380${Math.floor(Math.random() * 900000000) + 100000000}`,
         is_primary: true,
         created_at: new Date(),
         updated_at: new Date()
