@@ -21,7 +21,8 @@
     "cors": "^2.8.5",
     "helmet": "^6.0.1",
     "winston": "^3.8.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "compression": "^1.7.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
