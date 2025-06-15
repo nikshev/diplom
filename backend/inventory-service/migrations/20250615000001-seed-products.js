@@ -117,11 +117,11 @@ module.exports = {
         cost: Math.floor(Math.random() * 5000) + 50, // Собівартість від 50 до 5050
         weight: (Math.random() * 10 + 0.1).toFixed(2), // Вага від 0.1 до 10.1 кг
         weight_unit: 'kg',
-        dimensions: {
+        dimensions: JSON.stringify({
           length: Math.floor(Math.random() * 100) + 10,
           width: Math.floor(Math.random() * 100) + 10,
           height: Math.floor(Math.random() * 100) + 10
-        },
+        }),
         is_active: true,
         created_at: new Date(),
         updated_at: new Date()
