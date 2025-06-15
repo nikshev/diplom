@@ -42,6 +42,8 @@ class ProductService {
       includeInventory = false,
     } = options;
 
+    logger.info('ProductService.getProducts called with options:', options);
+
     const offset = (page - 1) * limit;
     const where = {};
 
@@ -76,6 +78,8 @@ class ProductService {
       };
     }
 
+    logger.info('ProductService.getProducts where clause:', where);
+
     // Set up include models
     const include = [
       {
@@ -99,6 +103,8 @@ class ProductService {
       });
     }
 
+    logger.info('ProductService.getProducts query params:', { where, include, sortBy, sortOrder, limit, offset });
+
     // Get products with pagination
     const { count, rows } = await this.Product.findAndCountAll({
       where,
@@ -108,6 +114,8 @@ class ProductService {
       offset,
       distinct: true,
     });
+
+    logger.info('ProductService.getProducts query result:', { count, rowsLength: rows.length });
 
     // Calculate pagination metadata
     const totalPages = Math.ceil(count / limit);
