@@ -28,11 +28,7 @@ import {
   ShoppingCart as OrdersIcon,
   People as CustomersIcon,
   Inventory as ProductsIcon,
-  AttachMoney as FinanceIcon,
   BarChart as AnalyticsIcon,
-  Description as ReportsIcon,
-  Person as UserIcon,
-  Settings as SettingsIcon,
   Notifications as NotificationsIcon,
   Logout as LogoutIcon,
   AccountCircle as AccountIcon,
@@ -136,34 +132,10 @@ const Layout = () => {
       enabled: MODULES.inventory.enabled 
     },
     { 
-      text: 'Фінанси', 
-      icon: <FinanceIcon />, 
-      path: '/finance', 
-      enabled: MODULES.finance.enabled 
-    },
-    { 
       text: 'Аналітика', 
       icon: <AnalyticsIcon />, 
       path: '/analytics', 
       enabled: MODULES.analytics.enabled 
-    },
-    { 
-      text: 'Звіти', 
-      icon: <ReportsIcon />, 
-      path: '/reports', 
-      enabled: MODULES.reports.enabled 
-    },
-    { 
-      text: 'Користувачі', 
-      icon: <UserIcon />, 
-      path: '/users', 
-      enabled: MODULES.users.enabled 
-    },
-    { 
-      text: 'Налаштування', 
-      icon: <SettingsIcon />, 
-      path: '/settings', 
-      enabled: MODULES.settings.enabled 
     }
   ];
 
