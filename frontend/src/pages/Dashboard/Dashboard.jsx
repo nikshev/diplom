@@ -417,7 +417,7 @@ const Dashboard = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={item.name}
-                        secondary={`Категорія: ${item.category}`}
+                        secondary={`Категорія: ${item.category?.name || 'Не вказано'}`}
                       />
                     </ListItem>
                   ))}

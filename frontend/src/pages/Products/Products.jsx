@@ -284,7 +284,7 @@ const Products = () => {
                 <TableRow key={product.id}>
                   <TableCell>{product.sku || 'Н/Д'}</TableCell>
                   <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.category || 'Н/Д'}</TableCell>
+                  <TableCell>{product.category?.name || 'Н/Д'}</TableCell>
                   <TableCell align="right">{formatCurrency(product.price)}</TableCell>
                   <TableCell align="right">
                     {product.track_inventory ? product.quantity : 'Н/Д'}

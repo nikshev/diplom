@@ -191,7 +191,7 @@ const InventoryAnalytics = ({ timeframe }) => {
                   {data.low_stock_items.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.category}</TableCell>
+                      <TableCell>{item.category?.name || 'Н/Д'}</TableCell>
                       <TableCell align="right">{item.stock}</TableCell>
                       <TableCell align="right">{item.threshold}</TableCell>
                       <TableCell align="right">{formatCurrency(item.unit_price)}</TableCell>

@@ -334,7 +334,7 @@ const ProductDetails = () => {
                   Категорія
                 </Typography>
                 <Typography variant="body1">
-                  {product.category || 'Не вказано'}
+                  {product.category?.name || 'Не вказано'}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
