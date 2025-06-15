@@ -139,9 +139,8 @@ module.exports = {
       product_id: product.id,
       warehouse_id: warehouseId,
       quantity: Math.floor(Math.random() * 1000) + 10, // Кількість від 10 до 1010
-      reserved_quantity: Math.floor(Math.random() * 50), // Зарезервовано від 0 до 50
-      low_stock_threshold: Math.floor(Math.random() * 20) + 5, // Поріг від 5 до 25
-      track_inventory: true,
+      quantity_reserved: Math.floor(Math.random() * 50), // Зарезервовано від 0 до 50
+      min_quantity: Math.floor(Math.random() * 20) + 5, // Поріг від 5 до 25
       created_at: new Date(),
       updated_at: new Date()
     }));
