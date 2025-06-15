@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import jwt_decode from 'jwt-decode';
+import { authApi } from '../services/api';
+import { AUTH_TOKEN_KEY } from '../config';
 
 const AuthContext = createContext(null);
 
@@ -7,7 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem(AUTH_TOKEN_KEY));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,23 +42,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
+      const response = await authApi.login({ email, password });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       
       // Save token to localStorage
-      localStorage.setItem('token', data.token);
+      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
       setToken(data.token);
       
       // Set current user
@@ -94,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     // Remove token from localStorage
-    localStorage.removeItem('token');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     setToken(null);
     setCurrentUser(null);
   };
