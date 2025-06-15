@@ -2,8 +2,25 @@
  * Configuration for frontend application
  */
 
+// Dynamically determine API base URL
+const getApiBaseUrl = () => {
+  // If REACT_APP_API_URL is set, use it
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // For production, try to use the current hostname
+  if (process.env.NODE_ENV === 'production') {
+    const hostname = window.location.hostname;
+    return `http://${hostname}/api/v1`;
+  }
+  
+  // Default to localhost for development
+  return `http://${hostname}/api/v1`;
+};
+
 // API base URL
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+export const API_BASE_URL = getApiBaseUrl();
 
 // Authentication settings
 export const AUTH_TOKEN_KEY = 'auth_token';
