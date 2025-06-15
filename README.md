@@ -66,11 +66,15 @@
    ```bash
    npm run setup:env:dev
    ```
-3. Запустіть систему:
+3. Побудуйте Docker образи:
+   ```bash
+   npm run build
+   ```
+4. Запустіть систему:
    ```bash
    npm run start:dev
    ```
-4. Відкрийте браузер за адресою `http://localhost:3000`
+5. Відкрийте браузер за адресою `http://localhost:3000`
 
 ### Налаштування середовищ
 

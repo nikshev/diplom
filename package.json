@@ -33,7 +33,8 @@
     "setup:env": "./config/setup-env.sh",
     "setup:env:dev": "./config/setup-env.sh development",
     "setup:env:test": "./config/setup-env.sh testing",
-    "setup:env:prod": "./config/setup-env.sh production"
+    "setup:env:prod": "./config/setup-env.sh production",
+    "build": "docker-compose build"
   },
   "repository": {
     "type": "git",
