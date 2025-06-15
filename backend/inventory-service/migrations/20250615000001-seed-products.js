@@ -4,6 +4,17 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // Check if data already exists
+    const existingCategories = await queryInterface.sequelize.query(
+      'SELECT COUNT(*) as count FROM inventory_service.categories',
+      { type: Sequelize.QueryTypes.SELECT }
+    );
+    
+    if (existingCategories[0].count > 0) {
+      console.log('Inventory data already exists, skipping seed data insertion');
+      return;
+    }
+
     // First, create some categories
     const categories = [
       {

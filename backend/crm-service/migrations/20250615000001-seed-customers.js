@@ -4,6 +4,17 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // Check if customers already exist
+    const existingCustomers = await queryInterface.sequelize.query(
+      'SELECT COUNT(*) as count FROM crm_service.customers',
+      { type: Sequelize.QueryTypes.SELECT }
+    );
+    
+    if (existingCustomers[0].count > 0) {
+      console.log('Customers already exist, skipping seed data insertion');
+      return;
+    }
+
     // Generate 50 customers
     const customers = [];
     const firstNames = [
