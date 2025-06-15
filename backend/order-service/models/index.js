@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { initDatabase, ensureSchemaExists } = require('../../shared/database');
+const { initDatabase, ensureSchemaExists } = require('../shared/database');
 
 // Schema name for order service
 const SCHEMA = 'order_service';

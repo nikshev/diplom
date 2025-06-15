@@ -78,7 +78,7 @@ async function initDatabase(schema, modelsDir, options = {}) {
     // Load models
     if (modelsDir && fs.existsSync(modelsDir)) {
       const modelFiles = fs.readdirSync(modelsDir)
-        .filter(file => file.endsWith('.js') && !file.startsWith('.'));
+        .filter(file => file.endsWith('.js') && !file.startsWith('.') && file !== 'index.js' && file !== 'db-instance.js');
 
       // Import model definitions
       for (const file of modelFiles) {

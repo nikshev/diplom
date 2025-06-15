@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     token: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
       allowNull: false,
       unique: true
     },

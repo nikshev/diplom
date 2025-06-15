@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { initDatabase, ensureSchemaExists } = require('../../shared/database');
+const { initDatabase, ensureSchemaExists } = require('../shared/database');
 
 // Schema name for inventory service
 const SCHEMA = 'inventory_service';

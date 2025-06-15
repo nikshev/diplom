@@ -4,13 +4,22 @@
 
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
-const db = require('../models');
+const { getDbInstance } = require('../models/db-instance');
 const { NotFoundError, ConflictError, BadRequestError } = require('../utils/errors');
 const logger = require('../config/logger');
 
-const User = db.User;
-const Role = db.Role;
-const Permission = db.Permission;
+/**
+ * Get database models
+ * @returns {Object} Database models
+ */
+const getModels = () => {
+  const db = getDbInstance();
+  return {
+    User: db.User,
+    Role: db.Role,
+    Permission: db.Permission,
+  };
+};
 
 /**
  * Create a new user
@@ -18,6 +27,7 @@ const Permission = db.Permission;
  * @returns {Promise<Object>} Created user
  */
 const createUser = async (userData) => {
+  const { User } = getModels();
   // Check if user with email already exists
   const existingUser = await User.findOne({ where: { email: userData.email } });
   if (existingUser) {
@@ -50,6 +60,7 @@ const createUser = async (userData) => {
  * @returns {Promise<Object>} User
  */
 const getUserById = async (id) => {
+  const { User } = getModels();
   const user = await User.findByPk(id);
   
   if (!user) {
@@ -69,6 +80,7 @@ const getUserById = async (id) => {
  * @returns {Promise<Object>} User
  */
 const getUserByEmail = async (email) => {
+  const { User } = getModels();
   const user = await User.findOne({ where: { email } });
   
   if (!user) {
@@ -84,6 +96,7 @@ const getUserByEmail = async (email) => {
  * @returns {Promise<Object>} Users and pagination info
  */
 const getUsers = async (options = {}) => {
+  const { User } = getModels();
   const page = parseInt(options.page, 10) || 1;
   const limit = parseInt(options.limit, 10) || 10;
   const offset = (page - 1) * limit;
@@ -134,6 +147,7 @@ const getUsers = async (options = {}) => {
  * @returns {Promise<Object>} Updated user
  */
 const updateUser = async (id, userData) => {
+  const { User } = getModels();
   const user = await User.findByPk(id);
   
   if (!user) {
@@ -177,6 +191,7 @@ const updateUser = async (id, userData) => {
  * @returns {Promise<boolean>} Success
  */
 const deleteUser = async (id) => {
+  const { User } = getModels();
   const user = await User.findByPk(id);
   
   if (!user) {
@@ -198,6 +213,7 @@ const deleteUser = async (id) => {
  * @returns {Promise<boolean>} Success
  */
 const changePassword = async (id, currentPassword, newPassword) => {
+  const { User } = getModels();
   const user = await User.findByPk(id);
   
   if (!user) {
@@ -226,6 +242,7 @@ const changePassword = async (id, currentPassword, newPassword) => {
  * @returns {Promise<boolean>} Success
  */
 const resetPassword = async (id, newPassword) => {
+  const { User } = getModels();
   const user = await User.findByPk(id);
   
   if (!user) {
@@ -247,6 +264,7 @@ const resetPassword = async (id, newPassword) => {
  * @returns {Promise<Array>} User permissions
  */
 const getUserPermissions = async (userId) => {
+  const { User, Role, Permission } = getModels();
   const user = await User.findByPk(userId);
   
   if (!user) {

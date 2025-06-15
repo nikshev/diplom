@@ -3,7 +3,7 @@
  */
 
 // API base URL
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 // Authentication settings
 export const AUTH_TOKEN_KEY = 'auth_token';

@@ -19,6 +19,8 @@ const API_VERSION = 'v1';
 
 // Routes
 router.use(`/${API_VERSION}/auth`, authRoutes);
+// Add non-versioned route for auth to handle requests at /api/auth/login
+router.use('/auth', authRoutes);
 router.use(`/${API_VERSION}/orders`, orderRoutes);
 router.use(`/${API_VERSION}/crm`, crmRoutes);
 router.use(`/${API_VERSION}/inventory`, inventoryRoutes);

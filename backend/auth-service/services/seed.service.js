@@ -4,21 +4,21 @@
  */
 
 const bcrypt = require('bcrypt');
-const db = require('../models');
 const config = require('../config');
 const logger = require('../config/logger');
 
-const User = db.User;
-const Role = db.Role;
-const Permission = db.Permission;
-const RolePermission = db.RolePermission;
-
 /**
  * Seed default data
+ * @param {object} db - Database object
  * @returns {Promise<void>}
  */
-const seedData = async () => {
+const seedData = async (db) => {
   try {
+    const User = db.User;
+    const Role = db.Role;
+    const Permission = db.Permission;
+    const RolePermission = db.RolePermission;
+
     // Create default roles if they don't exist
     for (const roleData of config.defaultRoles) {
       const [role, created] = await Role.findOrCreate({

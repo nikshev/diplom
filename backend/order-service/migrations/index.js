@@ -3,8 +3,8 @@
  */
 
 const path = require('path');
-const { createDatabaseConnection } = require('../../shared/database');
-const { runMigrations, rollbackMigrations, getMigrationStatus, createMigration } = require('../../shared/migrations');
+const { createDatabaseConnection } = require('../shared/database');
+const { runMigrations, rollbackMigrations, getMigrationStatus, createMigration } = require('../shared/migrations');
 
 // Schema name for order service
 const SCHEMA = 'order_service';

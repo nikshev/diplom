@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { initDatabase, ensureSchemaExists } = require('../../shared/database');
+const { initDatabase, ensureSchemaExists } = require('../shared/database');
 
 // Schema name for auth service
 const SCHEMA = 'auth_service';
@@ -22,7 +22,7 @@ async function init() {
   
   // Load models
   const modelFiles = fs.readdirSync(__dirname)
-    .filter(file => file !== 'index.js' && file.endsWith('.js'));
+    .filter(file => file !== 'index.js' && file !== 'db-instance.js' && file.endsWith('.js'));
   
   for (const file of modelFiles) {
     const model = require(path.join(__dirname, file))(db.sequelize, db.Sequelize);

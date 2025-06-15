@@ -27,8 +27,10 @@ services:
   # Auth Service
   auth-service:
     build:
-      context: ./backend/auth-service
-      dockerfile: ../../docker/development/node-service.Dockerfile
+      context: ./backend
+      dockerfile: ../docker/development/node-service.Dockerfile
+      args:
+        SERVICE_DIR: auth-service
     ports:
       - "8001:8001"
     env_file:
@@ -37,6 +39,7 @@ services:
       - postgres
     volumes:
       - ./backend/auth-service:/app
+      - ./backend/shared:/app/shared
       - /app/node_modules
     command: sh -c "npm install && npm run dev"
     networks:
@@ -45,8 +48,10 @@ services:
   # Order Service
   order-service:
     build:
-      context: ./backend/order-service
-      dockerfile: ../../docker/development/node-service.Dockerfile
+      context: ./backend
+      dockerfile: ../docker/development/node-service.Dockerfile
+      args:
+        SERVICE_DIR: order-service
     ports:
       - "8002:8002"
     env_file:
@@ -55,6 +60,7 @@ services:
       - postgres
     volumes:
       - ./backend/order-service:/app
+      - ./backend/shared:/app/shared
       - /app/node_modules
     command: sh -c "npm install && npm run dev"
     networks:
@@ -63,8 +69,10 @@ services:
   # CRM Service
   crm-service:
     build:
-      context: ./backend/crm-service
-      dockerfile: ../../docker/development/node-service.Dockerfile
+      context: ./backend
+      dockerfile: ../docker/development/node-service.Dockerfile
+      args:
+        SERVICE_DIR: crm-service
     ports:
       - "8003:8003"
     env_file:
@@ -73,6 +81,7 @@ services:
       - postgres
     volumes:
       - ./backend/crm-service:/app
+      - ./backend/shared:/app/shared
       - /app/node_modules
     command: sh -c "npm install && npm run dev"
     networks:
@@ -81,8 +90,10 @@ services:
   # Inventory Service
   inventory-service:
     build:
-      context: ./backend/inventory-service
-      dockerfile: ../../docker/development/node-service.Dockerfile
+      context: ./backend
+      dockerfile: ../docker/development/node-service.Dockerfile
+      args:
+        SERVICE_DIR: inventory-service
     ports:
       - "8004:8004"
     env_file:
@@ -91,6 +102,7 @@ services:
       - postgres
     volumes:
       - ./backend/inventory-service:/app
+      - ./backend/shared:/app/shared
       - /app/node_modules
     command: sh -c "npm install && npm run dev"
     networks:
@@ -99,8 +111,10 @@ services:
   # Finance Service
   finance-service:
     build:
-      context: ./backend/finance-service
-      dockerfile: ../../docker/development/node-service.Dockerfile
+      context: ./backend
+      dockerfile: ../docker/development/node-service.Dockerfile
+      args:
+        SERVICE_DIR: finance-service
     ports:
       - "8005:8005"
     env_file:
@@ -109,6 +123,7 @@ services:
       - postgres
     volumes:
       - ./backend/finance-service:/app
+      - ./backend/shared:/app/shared
       - /app/node_modules
     command: sh -c "npm install && npm run dev"
     networks:

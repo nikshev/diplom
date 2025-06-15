@@ -28,8 +28,13 @@ const createServiceProxy = (serviceName, serviceUrl, options = {}) => {
   const proxy = httpProxy(url.origin, {
     // Append path from the gateway to the target service
     proxyReqPathResolver: (req) => {
-      const path = req.originalUrl;
-      logger.debug(`Proxying request to ${serviceName}: ${path}`);
+      const originalPath = req.originalUrl;
+      // For auth service, keep the path as is (/api/v1/auth/login)
+      // For other services, convert /api/v1/... to /api/...
+      const path = serviceName === 'auth-service' 
+        ? originalPath
+        : originalPath.replace(/^\/api\/v1/, '/api');
+      logger.debug(`Proxying request to ${serviceName}: ${originalPath} -> ${path}`);
       return path;
     },
     

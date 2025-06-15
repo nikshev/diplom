@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { initDatabase, ensureSchemaExists } = require('../../shared/database');
+const { initDatabase, ensureSchemaExists } = require('../shared/database');
 
 // Schema name for finance service
 const SCHEMA = 'finance_service';

@@ -13,7 +13,9 @@ const config = require('./config');
 const logger = require('./config/logger');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler');
-const db = require('./models');
+const { init: initModels } = require('./models');
+const { setDbInstance } = require('./models/db-instance');
+const { migrate } = require('./migrations');
 const seedService = require('./services/seed.service');
 
 // Create Express app
@@ -40,7 +42,8 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/api', routes);
+// Mount routes at /api/v1 to match the API Gateway path
+app.use('/api/v1', routes);
 
 // 404 handler
 app.use((req, res) => {
@@ -57,12 +60,19 @@ app.use(errorHandler);
 // Initialize database and start server
 const startServer = async () => {
   try {
+    // Initialize database
+    const db = await initModels();
+    setDbInstance(db);
+    
     // Test database connection
     await db.sequelize.authenticate();
     logger.info('Database connection established successfully');
     
+    // Run migrations
+    await migrate(db);
+    
     // Seed default data
-    await seedService.seedData();
+    await seedService.seedData(db);
     
     // Start server
     const PORT = config.server.port;

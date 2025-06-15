@@ -48,7 +48,7 @@ export const authApi = {
    * @param {string} refreshToken - Refresh token
    * @returns {Promise} - Promise with new tokens
    */
-  refreshToken: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+  refreshToken: (refreshToken) => api.post('/auth/refresh-token', { refreshToken }),
 
   /**
    * Change password
@@ -62,7 +62,7 @@ export const authApi = {
    * @param {string} email - User email
    * @returns {Promise} - Promise with result
    */
-  requestPasswordReset: (email) => api.post('/auth/forgot-password', { email }),
+  requestPasswordReset: (email) => api.post('/auth/request-password-reset', { email }),
 
   /**
    * Reset password

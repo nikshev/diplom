@@ -17,7 +17,7 @@ const fs = require('fs');
 function createMigrationInstance(sequelize, migrationsDir) {
   return new Umzug({
     migrations: {
-      glob: path.join(migrationsDir, '*.js'),
+      glob: path.join(migrationsDir, '[0-9]*.js'), // Only load files starting with digits
       resolve: ({ name, path, context }) => {
         const migration = require(path);
         return {

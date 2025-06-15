@@ -22,10 +22,10 @@ router.get('/', (req, res) => {
     message: 'Auth Service API',
     version: '1.0.0',
     endpoints: [
-      '/api/auth',
-      '/api/users',
-      '/api/roles',
-      '/api/permissions',
+      '/api/v1/auth',
+      '/api/v1/users',
+      '/api/v1/roles',
+      '/api/v1/permissions',
     ],
   });
 });
