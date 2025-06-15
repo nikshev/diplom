@@ -74,7 +74,7 @@ const Product = sequelize.define('Product', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
   },
-  costPrice: {
+  cost: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
   },
@@ -145,7 +145,7 @@ app.get('/health', (req, res) => {
 // Create product endpoint
 app.post('/api/products', async (req, res) => {
   try {
-    const { name, sku, description, category, price, costPrice, stockQuantity, reorderLevel } = req.body;
+    const { name, sku, description, category, price, cost, stockQuantity, reorderLevel } = req.body;
     
     // Check if product already exists
     const existingProduct = await Product.findOne({ where: { sku } });
@@ -160,7 +160,7 @@ app.post('/api/products', async (req, res) => {
       description,
       category,
       price,
-      costPrice,
+      cost,
       stockQuantity,
       reorderLevel
     });
@@ -221,7 +221,7 @@ app.get('/api/products/:id', async (req, res) => {
 app.put('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, category, price, costPrice, reorderLevel, status } = req.body;
+    const { name, description, category, price, cost, reorderLevel, status } = req.body;
     
     const product = await Product.findOne({ where: { id } });
     
@@ -234,7 +234,7 @@ app.put('/api/products/:id', async (req, res) => {
     product.description = description || product.description;
     product.category = category || product.category;
     product.price = price || product.price;
-    product.costPrice = costPrice || product.costPrice;
+    product.cost = cost || product.cost;
     product.reorderLevel = reorderLevel || product.reorderLevel;
     product.status = status || product.status;
     

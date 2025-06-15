@@ -252,14 +252,14 @@ const CustomerDetails = () => {
         >
           Клієнти
         </Link>
-        <Typography color="text.primary">{customer.name}</Typography>
+        <Typography color="text.primary">{`${customer.first_name || ''} ${customer.last_name || ''}`.trim()}</Typography>
       </Breadcrumbs>
 
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box display="flex" alignItems="center">
           <Typography variant="h4" mr={2}>
-            {customer.name}
+            {`${customer.first_name || ''} ${customer.last_name || ''}`.trim()}
           </Typography>
           <Chip
             label={getCustomerStatusLabel(customer.status)}
@@ -379,12 +379,22 @@ const CustomerDetails = () => {
                       </Typography>
                     </Box>
                   </Grid>
-                  {customer.company && (
+                  {customer.company_name && (
                     <Grid item xs={12}>
                       <Box display="flex" alignItems="center">
                         <BusinessIcon color="action" sx={{ mr: 1 }} />
                         <Typography variant="body1">
-                          {customer.company}
+                          {customer.company_name}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                  {customer.tax_id && (
+                    <Grid item xs={12}>
+                      <Box display="flex" alignItems="center">
+                        <BusinessIcon color="action" sx={{ mr: 1 }} />
+                        <Typography variant="body1">
+                          Податковий номер: {customer.tax_id}
                         </Typography>
                       </Box>
                     </Grid>
@@ -573,7 +583,7 @@ const CustomerDetails = () => {
         <DialogTitle>Видалення клієнта</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Ви впевнені, що хочете видалити клієнта "{customer.name}"? Ця дія не може бути скасована.
+            Ви впевнені, що хочете видалити клієнта "{`${customer.first_name || ''} ${customer.last_name || ''}`.trim()}"? Ця дія не може бути скасована.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

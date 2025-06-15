@@ -48,17 +48,19 @@ const validationSchema = Yup.object({
   name: Yup.string().required("Назва товару обов'язкова"),
   sku: Yup.string().nullable(),
   price: Yup.number().required("Ціна обов'язкова").min(0, "Ціна не може бути від'ємною"),
-  cost_price: Yup.number().nullable().min(0, "Собівартість не може бути від'ємною"),
+  cost: Yup.number().nullable().min(0, "Собівартість не може бути від'ємною"),
   category: Yup.string().nullable(),
   description: Yup.string().nullable(),
   track_inventory: Yup.boolean(),
-  quantity: Yup.number().when('track_inventory', {
-    is: true,
-    then: Yup.number().required("Кількість обов'язкова").min(0, "Кількість не може бути від'ємною")
+  quantity: Yup.number().when('track_inventory', (track_inventory, schema) => {
+    return track_inventory 
+      ? schema.required("Кількість обов'язкова").min(0, "Кількість не може бути від'ємною")
+      : schema.nullable();
   }),
-  low_stock_threshold: Yup.number().when('track_inventory', {
-    is: true,
-    then: Yup.number().required("Поріг низького запасу обов'язковий").min(0, "Поріг не може бути від'ємним")
+  low_stock_threshold: Yup.number().when('track_inventory', (track_inventory, schema) => {
+    return track_inventory 
+      ? schema.required("Поріг низького запасу обов'язковий").min(0, "Поріг не може бути від'ємним")
+      : schema.nullable();
   })
 });
 
@@ -117,7 +119,7 @@ const ProductForm = () => {
       name: '',
       sku: '',
       price: '',
-      cost_price: '',
+      cost: '',
       category: '',
       description: '',
       details: '',
@@ -148,7 +150,7 @@ const ProductForm = () => {
         name: productData.name || '',
         sku: productData.sku || '',
         price: productData.price || '',
-        cost_price: productData.cost_price || '',
+        cost: productData.cost || '',
         category: productData.category || '',
         description: productData.description || '',
         details: productData.details || '',
@@ -335,15 +337,15 @@ const ProductForm = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    id="cost_price"
-                    name="cost_price"
+                    id="cost"
+                    name="cost"
                     label="Собівартість"
                     type="number"
-                    value={formik.values.cost_price}
+                    value={formik.values.cost}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.cost_price && Boolean(formik.errors.cost_price)}
-                    helperText={formik.touched.cost_price && formik.errors.cost_price}
+                    error={formik.touched.cost && Boolean(formik.errors.cost)}
+                    helperText={formik.touched.cost && formik.errors.cost}
                     variant="outlined"
                     InputProps={{
                       inputProps: { min: 0, step: 0.01 }

@@ -100,7 +100,8 @@ const ProductDetails = () => {
       return response.data;
     },
     {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      enabled: !!id && id !== 'undefined'
     }
   );
 
@@ -196,6 +197,23 @@ const ProductDetails = () => {
           sx={{ mt: 2 }}
         >
           Повернутися до списку
+        </Button>
+      </Box>
+    );
+  }
+
+  if (!id || id === 'undefined') {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" color="error">
+          Невірний ID продукту
+        </Typography>
+        <Button 
+          variant="contained" 
+          onClick={() => navigate('/products')}
+          sx={{ mt: 2 }}
+        >
+          Повернутися до списку продуктів
         </Button>
       </Box>
     );

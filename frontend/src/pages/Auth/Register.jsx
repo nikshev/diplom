@@ -26,7 +26,8 @@ import {
 
 // Validation schema
 const validationSchema = Yup.object({
-  name: Yup.string().required("Ім'я обов'язкове"),
+  first_name: Yup.string().required("Ім'я обов'язкове"),
+  last_name: Yup.string().required("Прізвище обов'язкове"),
   email: Yup.string().email('Введіть коректний email').required("Email обов'язковий"),
   password: Yup.string()
     .min(8, 'Пароль повинен містити щонайменше 8 символів')
@@ -67,7 +68,8 @@ const Register = () => {
   // Initialize formik
   const formik = useFormik({
     initialValues: {
-      name: '',
+      first_name: '',
+      last_name: '',
       email: '',
       password: '',
       confirmPassword: ''
@@ -107,17 +109,32 @@ const Register = () => {
 
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
               <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    id="name"
-                    name="name"
-                    label="Повне ім'я"
-                    value={formik.values.name}
+                    id="first_name"
+                    name="first_name"
+                    label="Ім'я"
+                    value={formik.values.first_name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
+                    error={formik.touched.first_name && Boolean(formik.errors.first_name)}
+                    helperText={formik.touched.first_name && formik.errors.first_name}
+                    variant="outlined"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    id="last_name"
+                    name="last_name"
+                    label="Прізвище"
+                    value={formik.values.last_name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.last_name && Boolean(formik.errors.last_name)}
+                    helperText={formik.touched.last_name && formik.errors.last_name}
                     variant="outlined"
                     required
                   />

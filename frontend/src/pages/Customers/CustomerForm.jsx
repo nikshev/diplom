@@ -34,12 +34,13 @@ import * as Yup from 'yup';
 
 // Validation schema
 const validationSchema = Yup.object({
-  name: Yup.string().required("Ім'я обов'язкове"),
+  first_name: Yup.string().required("Ім'я обов'язкове"),
+  last_name: Yup.string().required("Прізвище обов'язкове"),
   email: Yup.string().email('Введіть коректний email').nullable(),
   phone: Yup.string().nullable(),
   type: Yup.string().required('Тип клієнта обов\'язковий'),
   status: Yup.string().required('Статус обов\'язковий'),
-  company: Yup.string().when('type', {
+  company_name: Yup.string().when('type', {
     is: 'business',
     then: Yup.string().required('Назва компанії обов\'язкова для юридичних осіб')
   }),
@@ -97,12 +98,13 @@ const CustomerForm = () => {
   // Initialize formik
   const formik = useFormik({
     initialValues: {
-      name: '',
+      first_name: '',
+      last_name: '',
       email: '',
       phone: '',
       type: 'individual',
       status: 'active',
-      company: '',
+      company_name: '',
       tax_id: '',
       address: '',
       notes: ''
@@ -121,12 +123,13 @@ const CustomerForm = () => {
   useEffect(() => {
     if (customerData) {
       formik.setValues({
-        name: customerData.name || '',
+        first_name: customerData.first_name || '',
+        last_name: customerData.last_name || '',
         email: customerData.email || '',
         phone: customerData.phone || '',
         type: customerData.type || 'individual',
         status: customerData.status || 'active',
-        company: customerData.company || '',
+        company_name: customerData.company_name || '',
         tax_id: customerData.tax_id || '',
         address: customerData.address || '',
         notes: customerData.notes || ''
@@ -193,14 +196,14 @@ const CustomerForm = () => {
           Клієнти
         </Link>
         <Typography color="text.primary">
-          {isEditMode ? `Редагування клієнта: ${customerData?.name}` : 'Новий клієнт'}
+          {isEditMode ? `Редагування клієнта: ${customerData?.first_name} ${customerData?.last_name}` : 'Новий клієнт'}
         </Typography>
       </Breadcrumbs>
 
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">
-          {isEditMode ? `Редагування клієнта: ${customerData?.name}` : 'Новий клієнт'}
+          {isEditMode ? `Редагування клієнта: ${customerData?.first_name} ${customerData?.last_name}` : 'Новий клієнт'}
         </Typography>
         <Box>
           <Button
@@ -238,14 +241,29 @@ const CustomerForm = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    id="name"
-                    name="name"
-                    label="Ім'я/Назва"
-                    value={formik.values.name}
+                    id="first_name"
+                    name="first_name"
+                    label="Ім'я"
+                    value={formik.values.first_name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
+                    error={formik.touched.first_name && Boolean(formik.errors.first_name)}
+                    helperText={formik.touched.first_name && formik.errors.first_name}
+                    variant="outlined"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    id="last_name"
+                    name="last_name"
+                    label="Прізвище"
+                    value={formik.values.last_name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.last_name && Boolean(formik.errors.last_name)}
+                    helperText={formik.touched.last_name && formik.errors.last_name}
                     variant="outlined"
                     required
                   />
@@ -345,14 +363,14 @@ const CustomerForm = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    id="company"
-                    name="company"
+                    id="company_name"
+                    name="company_name"
                     label="Компанія"
-                    value={formik.values.company}
+                    value={formik.values.company_name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.company && Boolean(formik.errors.company)}
-                    helperText={formik.touched.company && formik.errors.company}
+                    error={formik.touched.company_name && Boolean(formik.errors.company_name)}
+                    helperText={formik.touched.company_name && formik.errors.company_name}
                     variant="outlined"
                     required={formik.values.type === 'business'}
                   />

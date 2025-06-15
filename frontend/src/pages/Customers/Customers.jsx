@@ -290,7 +290,7 @@ const Customers = () => {
             {data && data.customers && data.customers.map((customer) => (
               <TableRow key={customer.id}>
                 <TableCell>{customer.id}</TableCell>
-                <TableCell>{customer.name}</TableCell>
+                <TableCell>{`${customer.first_name || ''} ${customer.last_name || ''}`.trim()}</TableCell>
                 <TableCell>{customer.email || 'Н/Д'}</TableCell>
                 <TableCell>{customer.phone || 'Н/Д'}</TableCell>
                 <TableCell>{getCustomerTypeLabel(customer.type)}</TableCell>
