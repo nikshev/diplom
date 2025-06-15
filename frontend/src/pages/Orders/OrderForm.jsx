@@ -49,6 +49,9 @@ const OrderForm = () => {
   const queryClient = useQueryClient();
   const isEditMode = Boolean(id);
 
+  // Check if form should be disabled (for shipped, delivered, or cancelled orders)
+  const [isFormDisabled, setIsFormDisabled] = useState(false);
+  
   // Initial order state
   const initialOrderState = {
     customer_id: '',
@@ -144,12 +147,18 @@ const OrderForm = () => {
   useEffect(() => {
     if (orderData) {
       setOrder({
-        ...orderData,
-        items: orderData.items || [] // Ensure items is always an array
+        ...initialOrderState, // Start with default values
+        ...orderData, // Override with API data
+        items: orderData.items || [], // Ensure items is always an array
+        // Ensure select fields have valid values
+        status: orderData.status || 'pending',
+        payment_method: orderData.payment_method || 'cash',
+        payment_status: orderData.payment_status || 'unpaid'
       });
       if (orderData.customer) {
         setSelectedCustomer(orderData.customer);
       }
+      setIsFormDisabled(['shipped', 'delivered', 'cancelled'].includes(orderData.status));
     }
   }, [orderData]);
 
@@ -269,6 +278,12 @@ const OrderForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Check if order can be updated (prevent updating shipped, delivered, or cancelled orders)
+    if (isFormDisabled) {
+      alert('Неможливо редагувати замовлення зі статусом "' + order.status + '"');
+      return;
+    }
+    
     // Prepare order data for submission
     const orderData = {
       ...order,
@@ -279,6 +294,8 @@ const OrderForm = () => {
         discount: item.discount
       }))
     };
+    
+    console.log('Submitting order data:', orderData);
     
     if (isEditMode) {
       updateOrderMutation.mutate(orderData);
@@ -369,14 +386,39 @@ const OrderForm = () => {
             color="primary"
             startIcon={<SaveIcon />}
             onClick={handleSubmit}
-            disabled={createOrderMutation.isLoading || updateOrderMutation.isLoading}
+            disabled={
+              createOrderMutation.isLoading || 
+              updateOrderMutation.isLoading ||
+              isFormDisabled
+            }
           >
             {createOrderMutation.isLoading || updateOrderMutation.isLoading
               ? 'Збереження...'
+              : isFormDisabled
+              ? 'Неможливо редагувати'
               : 'Зберегти'}
           </Button>
         </Box>
       </Box>
+
+      {/* Warning for non-editable orders */}
+      {isFormDisabled && (
+        <Box mb={3}>
+          <Typography
+            variant="body1"
+            sx={{
+              backgroundColor: 'warning.light',
+              color: 'warning.contrastText',
+              p: 2,
+              borderRadius: 1,
+              border: '1px solid',
+              borderColor: 'warning.main'
+            }}
+          >
+            ⚠️ Це замовлення не можна редагувати, оскільки воно має статус "{order.status}".
+          </Typography>
+        </Box>
+      )}
 
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -395,6 +437,7 @@ const OrderForm = () => {
                     value={selectedCustomer}
                     onChange={handleCustomerChange}
                     loading={customersLoading}
+                    disabled={isFormDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -427,6 +470,7 @@ const OrderForm = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    disabled={isFormDisabled}
                   >
                     <MenuItem value="pending">Очікує</MenuItem>
                     <MenuItem value="processing">Обробляється</MenuItem>
@@ -445,6 +489,7 @@ const OrderForm = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    disabled={isFormDisabled}
                   >
                     <MenuItem value="cash">Готівка</MenuItem>
                     <MenuItem value="card">Картка</MenuItem>
@@ -462,6 +507,7 @@ const OrderForm = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    disabled={isFormDisabled}
                   >
                     <MenuItem value="unpaid">Не оплачено</MenuItem>
                     <MenuItem value="paid">Оплачено</MenuItem>
@@ -478,6 +524,7 @@ const OrderForm = () => {
                     fullWidth
                     multiline
                     rows={3}
+                    disabled={isFormDisabled}
                   />
                 </Grid>
               </Grid>
@@ -496,6 +543,7 @@ const OrderForm = () => {
                   color="primary"
                   startIcon={<AddIcon />}
                   onClick={handleAddProduct}
+                  disabled={isFormDisabled}
                 >
                   Додати товар
                 </Button>
@@ -527,6 +575,7 @@ const OrderForm = () => {
                               size="small"
                               color="error"
                               onClick={() => removeProduct(index)}
+                              disabled={isFormDisabled}
                             >
                               <DeleteIcon />
                             </IconButton>
@@ -577,6 +626,7 @@ const OrderForm = () => {
                       type="number"
                       inputProps={{ min: 0, step: 0.01 }}
                       sx={{ width: '100%' }}
+                      disabled={isFormDisabled}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -619,6 +669,7 @@ const OrderForm = () => {
                 multiline
                 rows={4}
                 placeholder="Додаткова інформація про замовлення..."
+                disabled={isFormDisabled}
               />
             </Paper>
           </Grid>
@@ -637,6 +688,7 @@ const OrderForm = () => {
                 value={selectedProduct}
                 onChange={handleProductChange}
                 loading={productsLoading}
+                disabled={isFormDisabled}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -680,6 +732,7 @@ const OrderForm = () => {
                 type="number"
                 inputProps={{ min: 1 }}
                 required
+                disabled={isFormDisabled}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -691,6 +744,7 @@ const OrderForm = () => {
                 fullWidth
                 type="number"
                 inputProps={{ min: 0, max: 100 }}
+                disabled={isFormDisabled}
               />
             </Grid>
             {selectedProduct && (
@@ -710,7 +764,7 @@ const OrderForm = () => {
             onClick={addProductToOrder}
             color="primary"
             variant="contained"
-            disabled={!selectedProduct}
+            disabled={!selectedProduct || isFormDisabled}
           >
             Додати
           </Button>

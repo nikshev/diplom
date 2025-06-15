@@ -227,11 +227,11 @@ const OrderDetails = () => {
           <Typography variant="h4" mr={2}>
             Замовлення #{order.id}
           </Typography>
-          <Chip
-            label={getStatusLabel(order.status)}
-            color={getStatusColor(order.status)}
-          />
         </Box>
+        <Chip
+          label={getStatusLabel(order.status)}
+          color={getStatusColor(order.status)}
+        />
         <Box>
           <Button
             variant="outlined"
@@ -310,16 +310,11 @@ const OrderDetails = () => {
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Статус
-                </Typography>
-                <Typography variant="body1">
-                  <Chip
-                    label={getStatusLabel(order.status)}
-                    color={getStatusColor(order.status)}
-                    size="small"
-                  />
-                </Typography>
+                <Chip
+                  label={getStatusLabel(order.status)}
+                  color={getStatusColor(order.status)}
+                  size="small"
+                />
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="subtitle2" color="text.secondary">
