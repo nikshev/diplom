@@ -20,6 +20,7 @@ services:
     volumes:
       - ./backend/api-gateway:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -37,6 +38,7 @@ services:
     volumes:
       - ./backend/auth-service:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -54,6 +56,7 @@ services:
     volumes:
       - ./backend/order-service:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -71,6 +74,7 @@ services:
     volumes:
       - ./backend/crm-service:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -88,6 +92,7 @@ services:
     volumes:
       - ./backend/inventory-service:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -105,6 +110,7 @@ services:
     volumes:
       - ./backend/finance-service:/app
       - /app/node_modules
+    command: sh -c "npm install && npm run dev"
     networks:
       - erp-network
 
@@ -123,6 +129,7 @@ services:
       - ./backend/analytics-service:/app
     networks:
       - erp-network
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && python main.py"
 
   # Frontend
   frontend:
@@ -138,6 +145,7 @@ services:
       - /app/node_modules
     networks:
       - erp-network
+    command: sh -c "npm install && npm start"
 
   # Database
   postgres:
