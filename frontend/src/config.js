@@ -12,11 +12,11 @@ const getApiBaseUrl = () => {
   // For production, try to use the current hostname
   if (process.env.NODE_ENV === 'production') {
     const hostname = window.location.hostname;
-    return `http://34.30.203.9/api/v1`;
+    return `http://34.30.203.9:8000/api/v1`;
   }
   
   // Default to localhost for development
-  return `http://34.30.203.9/api/v1`;
+  return `http://34.30.203.9:8000/api/v1`;
 };
 
 // API base URL
